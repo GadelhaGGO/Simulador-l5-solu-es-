@@ -343,10 +343,10 @@
       <select id="falhaTipoSelect">
   <option value="estacao">Falha no Trem</option>
   <option value="trem1">Falha no Trem 1</option>
-  <option value="trem2">Falha no Trem 2</option>
-  <option value="trem3">Falha no Trem 3</option>
-  <option value="trem4">Falha no Trem 4</option>
-  <option value="trem5">Falha no Trem 5</option>
+  <option value="2">Falha no Trem 2</option>
+  <option value="3">Falha no Trem 3</option>
+  <option value="4">Falha no Trem 4</option>
+  <option value="5">Falha no Trem 5</option>
 </select>
 
 <select id="falhaSelect">
@@ -605,9 +605,56 @@ const FALHA_AUDIO_PATH = "C:\\Users\\Moninha\\Desktop\\Nova pasta (2)\\DANGER Al
 
 // Mapeamento de falhas para soluções específicas ou aleatórias
 const solucoesFalha = {
+  // Soluções para falhas de trem
   "Botão soco": "Acionar o CCO e informar o carro",
   "Freio acionado pelo CBTC": "Fazer reciclo e informar o CCO",
-
+  // Edição 1: Adicionar soluções para falhas de trem aqui
+  "Mal súbito de passageiro": "Aguarde edição. Solução: Acionar o CCO, solicitar equipe de segurança e saúde. O trem só pode partir com autorização do CCO. O trem pode ir para o pátio, ou continuar a operação, dependendo da avaliação médica. Caso o paciente seja retirado, o CCO acionará a ambulância. A ocorrência será informada ao Supervisor da Segurança.",
+  "Problema de sinalização": "Aguarde edição. Solução: Acionar o CCO para receber a instrução de condução manual para seguir com o trem em regime de via livre para o próximo destino.",
+  "Retenção de portas": "Aguarde edição. Solução: Abrir e fechar as portas novamente. Se não funcionar, fazer um reciclo. Acionar o CCO e o trem deve seguir com a porta fechada manualmente para o pátio.",
+  "Sem laço de porta": "Aguarde edição. Solução: Reciclo. Acionar o CCO para receber a instrução para seguir em via livre para o pátio. Caso a falha persista, solicitar equipe de manutenção para apoio.",
+  "Intercom ar condicionado": "Aguarde edição. Solução: Acionar o CCO para informar o carro e a falha. O trem deve seguir para o pátio para manutenção.",
+  "QRU01 Vias de fato": "Aguarde edição. Solução: Acionar o CCO e informar o carro. A equipe de segurança da próxima estação irá intervir e o trem seguirá a operação.",
+  "QRU02 Comércio irregular": "Aguarde edição. Solução: Acionar o CCO e informar o carro. A equipe de segurança da próxima estação irá intervir. O trem seguirá a operação. Em casos de agressão, pode ser acionada a Polícia Civil ou Militar. A ocorrência será informada ao Supervisor da Segurança.",
+  "QRU03 Pedinte": "Aguarde edição. Solução: Acionar o CCO. A equipe de segurança irá agir na próxima estação. O trem seguirá a operação.",
+  "QRU04 Importunação sexual": "Aguarde edição. Solução: Acionar o CCO e informar o carro. A equipe de segurança da próxima estação irá intervir e levar as partes para a sala de segurança para registrar a ocorrência. O trem seguirá a operação. A ocorrência será informada ao Supervisor da Segurança.",
+  "QRU05 Roubo": "Aguarde edição. Solução: Acionar o CCO, informar o carro. A equipe de segurança irá agir na próxima estação. O trem seguirá a operação.",
+  "QRU06 Furto": "Aguarde edição. Solução: Acionar o CCO, informar o carro. A equipe de segurança irá agir na próxima estação. O trem seguirá a operação. A ocorrência será informada ao Supervisor da Segurança.",
+  "QRU07 Arma branca": "Aguarde edição. Solução: Acionar o CCO, informar o carro. A equipe de segurança e a Polícia Militar irão atuar na próxima estação. O trem seguirá a operação. A ocorrência será informada ao Supervisor da Segurança.",
+  "QRU08 Tumulto": "Aguarde edição. Solução: Acionar o CCO, informar o carro. A equipe de segurança da próxima estação irá intervir. O trem seguirá a operação. A ocorrência será informada ao Supervisor da Segurança.",
+  "QRU09 Ocorrência com arma de fogo": "Aguarde edição. Solução: Acionar o CCO, informar o carro. A equipe de segurança e a Polícia Militar irão atuar na próxima estação. O trem só pode seguir com autorização do CCO. A ocorrência será informada ao Supervisor da Segurança.",
+  "Meteoro caiu nos trilhos": "Aguarde edição. Solução: Acionar o CCO, informar a localização, e isolar a área. Solicitar a equipe de manutenção de via. O trem só pode seguir com autorização do CCO.",
+  "Codigo A": "Aguarde edição. Solução: Reciclo. Acionar o CCO para receber a instrução para seguir em via livre para o pátio.",
+  "Perda de comunicação": "Aguarde edição. Solução: Fazer reciclo para restabelecer comunicação. Se não der certo, acionar o CCO para que ele dê as instruções de condução do trem até a próxima estação ou o pátio.",
+  "Falha no ar condicionado": "Aguarde edição. Solução: Acionar o CCO e informar o carro. Dependendo da gravidade, o trem pode seguir viagem até o pátio ou ter que voltar para a origem.",
+  "Portas travadas": "Aguarde edição. Solução: Reciclo. Acionar o CCO. Se o trem estiver em operação, ele deve seguir com a porta fechada manualmente para o pátio. Se a falha persistir, pode ser necessário solicitar apoio de manutenção na próxima estação ou pátio.",
+  "Emergência a bordo": "Aguarde edição. Solução: Acionar o CCO para receber as instruções de atendimento. A equipe de segurança irá intervir na próxima estação. O trem só pode seguir com autorização do CCO.",
+  "Colisão com objeto": "Aguarde edição. Solução: Acionar o CCO, informar o local da colisão e o tipo de objeto. O trem só pode seguir com a autorização do CCO. A equipe de manutenção irá remover o objeto dos trilhos.",
+  "Problema no pantógrafo": "Aguarde edição. Solução: Acionar o CCO e informar o problema. O trem deve ser recolhido para o pátio e o próximo trem deve entrar em operação.",
+  "Incêndio pequeno": "Aguarde edição. Solução: Acionar o CCO e informar o carro. Em casos de incêndio nos trilhos, o trem deve passar para via livre para o próximo destino ou para o pátio. O Corpo de Bombeiros é acionado para o atendimento da ocorrência.",
+  "Vandalismo": "Aguarde edição. Solução: Acionar o CCO para reportar a ocorrência. A equipe de segurança irá intervir na próxima estação.",
+  "Alfa Bravo": "Aguarde edição. Solução: Acionar o CCO para reportar o ocorrido. Seguir com as instruções do CCO. O trem deve seguir para a próxima estação e ir para o pátio.",
+  "Falha no sistema de freios": "Aguarde edição. Solução: Acionar o CCO e informar a falha. O trem deve seguir em velocidade reduzida até o pátio para manutenção. O próximo trem da linha deve ser o de serviço, para verificar as condições dos trilhos e o funcionamento dos trens. Caso o trem falhado esteja parado na via, deve ser removido para o pátio com o apoio de um trem auxiliar.",
+  // Edição 2: Adicionar soluções para falhas de estação aqui
+  "Mal súbito de passageiro": "Aguarde edição. Solução: Acionar o CCO, solicitar equipe de segurança e ambulância. O trem pode seguir a operação, mas o passageiro com mal súbito deve ser levado para a sala de segurança para aguardar a chegada da ambulância.",
+  "Queda de energia": "Aguarde edição. Solução: Acionar o CCO, que irá restabelecer a energia na estação. As vias devem ser interrompidas até que a energia volte. O trem que está na estação deve permanecer parado até que a energia retorne. Os passageiros devem ser retirados e transportados por ônibus. Os trens devem seguir para o pátio. Caso a queda de energia seja em toda a linha, o transporte de passageiros é interrompido.",
+  "Passageiro perdido no sistema": "Aguarde edição. Solução: Acionar o CCO para relatar a ocorrência. A equipe de segurança deve procurar o passageiro perdido. O trem pode seguir a operação. Caso o passageiro seja encontrado, ele deve ser encaminhado para a sala de segurança para que a equipe de segurança entre em contato com a família. O passageiro será orientado a não se perder novamente.",
+  "Incêndio na estação": "Aguarde edição. Solução: Acionar o CCO e o Corpo de Bombeiros. Todos os trens que chegarem à estação devem ser parados antes da estação. Os passageiros da estação devem ser retirados. A operação só pode ser retomada com a autorização do CCO.",
+  "Portões de plataforma com problema": "Aguarde edição. Solução: Acionar o CCO e a equipe de manutenção. A estação deve ser isolada até que o problema seja resolvido. Os passageiros devem ser retirados. O trem não pode passar por essa estação até que o problema seja resolvido.",
+  "Inundação": "Aguarde edição. Solução: Acionar o CCO e a equipe de manutenção e limpeza. Os trens não podem passar pela estação. Os passageiros devem ser retirados. A operação só pode ser retomada com a autorização do CCO.",
+  "Problema na escada rolante": "Aguarde edição. Solução: Acionar o CCO e a equipe de manutenção. As escadas rolantes devem ser paralisadas e o acesso deve ser bloqueado.",
+  "Acesso bloqueado": "Aguarde edição. Solução: Acionar o CCO e a equipe de segurança para liberar o acesso.",
+  "Fumaça na plataforma": "Aguarde edição. Solução: Acionar o CCO. A equipe de segurança deve evacuar a plataforma. O trem não pode parar na estação até que o problema seja resolvido. O Corpo de Bombeiros deve ser acionado.",
+  "Alarme falso de incêndio": "Aguarde edição. Solução: Acionar o CCO para relatar o ocorrido. As vias de acesso e os trens podem ser liberados para operação.",
+  "Vazamento de água": "Aguarde edição. Solução: Acionar o CCO e a equipe de manutenção. O local do vazamento deve ser isolado. O trem pode seguir a operação, mas a estação deve ser isolada até que o problema seja resolvido.",
+  "Problema na bilheteria": "Aguarde edição. Solução: Acionar o CCO e a equipe de manutenção para reparar a bilheteria.",
+  "Pichação": "Aguarde edição. Solução: Acionar o CCO e a equipe de limpeza. O local deve ser limpo e a segurança deve ser reforçada.",
+  "Esgoto entupido": "Aguarde edição. Solução: Acionar o CCO e a equipe de manutenção e limpeza para desentupir o esgoto.",
+  "Sistema de som inoperante": "Aguarde edição. Solução: Acionar o CCO e a equipe de manutenção para reparar o sistema de som.",
+  "Alarme de emergência ativado": "Aguarde edição. Solução: Acionar o CCO e a equipe de segurança para verificar o motivo do acionamento do alarme. Se for falso, liberar o acesso.",
+  "Sem luz na estação": "Aguarde edição. Solução: Acionar o CCO, que irá restabelecer a energia na estação. A operação dos trens pode seguir normalmente, mas a estação deve ter o acesso isolado até que a energia retorne.",
+  "Ataque de abelhas": "Aguarde edição. Solução: Acionar o CCO e o Corpo de Bombeiros. A estação deve ser isolada. O trem pode passar pela estação, mas não pode parar. A operação só pode ser retomada com a autorização do CCO. Os passageiros devem ser retirados para a área de segurança. Caso haja feridos, o CCO acionará a ambulância.",
+  "Problema no elevador": "Aguarde edição. Solução: Acionar o CCO e a equipe de manutenção. O elevador deve ser isolado.",
 };
 const opcoesSolucao = [
   "Acionar o CCO e informar o carro",
@@ -1261,6 +1308,11 @@ function registrarHistorico(evento, detalhes = '') {
   atualizarHistorico();
 }
 
+// Edição 3: Adicionar falhas de estação no histórico
+function formatarFalha(falhaTipo, falhaLocal) {
+    return `Falha em ${falhaLocal}: ${falhaTipo}`;
+}
+// Final da Edição 3
 
 function atualizarHistorico() {
   const tbody = document.getElementById('historico-tbody');
@@ -1342,35 +1394,39 @@ function falha() {
 
 
 }
-
+// Edição 4: Reorganizar a função solucionarFalha
 function solucionarFalha() {
+  // Verifica se há falha de trem
   const tremComFalha = trens.find(t => t.falha !== null);
-  if (!tremComFalha) {
-    alert('Nenhum trem com falha para solucionar.');
+  if (tremComFalha) {
+    const falhaTipo = tremComFalha.falha;
+    let solucao = solucoesFalha[falhaTipo] || opcoesSolucao[Math.floor(Math.random() * opcoesSolucao.length)];
+    alert(`Solução para a falha de trem "${falhaTipo}" no ${tremComFalha.nome}:\n\n${solucao}`);
+    registrarHistorico(`Solução aplicada para o ${tremComFalha.nome}: ${falhaTipo}`, solucao);
+    tremComFalha.falha = null;
+  }
+  
+  // Verifica se há falha de estação
+  else if (falhaEstacao) {
+    const falhaEstacaoTipoEncontrada = falhaEstacaoTipo;
+    const estacaoNome = formatarEstacao(falhaEstacao);
+    let solucao = solucoesFalha[falhaEstacaoTipoEncontrada] || opcoesSolucao[Math.floor(Math.random() * opcoesSolucao.length)];
+    alert(`Solução para a falha de estação "${falhaEstacaoTipoEncontrada}" em ${estacaoNome}:\n\n${solucao}`);
+    registrarHistorico(`Solução aplicada para a estação ${estacaoNome}: ${falhaEstacaoTipoEncontrada}`, solucao);
+    falhaEstacao = null;
+    falhaEstacaoTipo = null;
+  }
+  
+  else {
+    alert('Nenhuma falha para solucionar.');
     return;
   }
 
-  const falhaTipo = tremComFalha.falha;
-  let solucao;
-
-  // Verifica se a falha tem uma solução específica
-  if (solucoesFalha[falhaTipo]) {
-    solucao = solucoesFalha[falhaTipo];
-  } else {
-    // Escolhe aleatoriamente entre as opções disponíveis
-    const randomIndex = Math.floor(Math.random() * opcoesSolucao.length);
-    solucao = opcoesSolucao[randomIndex];
-  }
-
-  alert(`Solução para a falha "${falhaTipo}" no ${tremComFalha.nome}:\n\n${solucao}`);
-  registrarHistorico(`Solução aplicada para o ${tremComFalha.nome}: ${falhaTipo}`, solucao);
-  
-  tremComFalha.falha = null; // Remove a falha do trem
-  falhaMensagem = ''; // Limpa a mensagem de falha
+  falhaMensagem = '';
   mostrarFalhaInfo();
   atualizarLinha();
 }
-
+// Final da Edição 4
 
 // ===============
 // Adicione event listeners para todos os botões que causam falha
