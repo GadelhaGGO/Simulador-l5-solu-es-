@@ -388,7 +388,8 @@
     <div class="falha-info" id="falha-info"></div>
   </div>
   <div class="historico-container">
-    <div class="historico-title">Histórico de Eventos</div>
+    <div class="historico-title">Histórico de Eventos</div>p3
+
     <table id="historico-table">
       <thead>
         <tr>
@@ -401,7 +402,7 @@
       <tbody id="historico-tbody"></tbody>
     </table>
   </div>
-  <audio id="falha-audio" src="C:\Users\Moninha\Desktop\Nova pasta (2)\DANGER Alarm Sound Effects.mp3" preload="auto" controls></audio>
+  <audio id="falha-audio" src="C:\Users\48-02687\Desktop\simulador l5 soluções\AUD-20250522-WA0000.mp3" preload="auto" controls></audio>
   <script>
     // ========================== 
 // Simulador Linha 5 Lilás JS (Ajuste: Áudio só para ao normalizar) 
@@ -464,7 +465,7 @@ const falhasEstacaoTextos = [
 // 24 trens, já prontos para serem espalhados com cores ajustadas
 // ===============
 const trens = Array.from({
-  length: 24
+  length: 12
 }).map((_, idx) => {
   let corClass = '';
   switch (idx + 1) { // Train IDs are 1-based
@@ -1422,12 +1423,14 @@ function solucionarFalha() {
     return;
   }
 
+  // **NOVO: Parar o áudio quando a solução é aplicada**
+  pararAudioFalha();
+
   falhaMensagem = '';
   mostrarFalhaInfo();
   atualizarLinha();
 }
 // Final da Edição 4
-
 // ===============
 // Adicione event listeners para todos os botões que causam falha
 // ===============
@@ -1516,4 +1519,4 @@ window.onclick = function(e) {
     <span style="font-size: 14px; color: #444;">Simulador</span>
   </footer>
 </body>
-</html>
+          </html>
