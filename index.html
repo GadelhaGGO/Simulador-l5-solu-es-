@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Simulação Linha 5 Lilás</title>
+  <title>Simulador Linha 5 Lilás</title>
   
   <style>
     /* Container para as colunas de status */
@@ -266,7 +266,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>Simulação da Linha 5 Lilás</h1>
+    <h1>Simulador Linha 5 Lilás</h1>
     <div class="via-label">Via 1 - Capão Redondo ⬅ Chácara Klabin</div>
     <div class="linha-container">
       <div class="linha" id="linha-estacoes">
@@ -289,8 +289,7 @@
         <div class="estacao" id="est17">Chácara<br>Klabin<br>🔁 1</div>
       </div>
     </div>
-    <div class="via-label">Via 2 - Capão Redondo ➡ Chácara Klabin</div>
-    <div class="linha-container">
+  <div class="linha-container">
       <div class="linha" id="linha-estacoes-via2">
         <div class="estacao" id="est1-v2">Capão<br>Redondo<br>🔁2</div>
         <div class="estacao" id="est2-v2">Campo<br>Limpo</div>
@@ -311,6 +310,8 @@
         <div class="estacao" id="est17-v2">Chácara<br>Klabin<br>🔁2</div>
       </div>
     </div>
+        <div class="via-label">Via 2 - Capão Redondo ➡ Chácara Klabin</div>
+  
     <div id="status-trens" class="status-container"></div>
     <div class="tempo" id="tempo">Tempo total: 0s</div>
 <div id="pote-counter" style="margin: 10px 0; font-size: 18px; font-weight: bold;">
@@ -404,6 +405,8 @@
   </div>
   <audio id="falha-audio" src="C:\Users\48-02687\Desktop\simulador l5 soluções\AUD-20250522-WA0000.mp3" preload="auto" controls></audio>
   <script>
+  
+
     // ========================== 
 // Simulador Linha 5 Lilás JS (Ajuste: Áudio só para ao normalizar) 
 // ========================== 
@@ -460,8 +463,114 @@ const falhasEstacaoTextos = [
   "Ataque de abelhas",
   "Problema no elevador"
 ];
+  // Código para inserir o marcador no final da linha
+const ultimaEstacao = document.getElementById('est17');
 
-// ===============
+if (ultimaEstacao) {
+    const marcadorFim = document.createElement('div');
+    marcadorFim.className = 'marcador-central';
+    marcadorFim.textContent = 'CBT'; // Você pode mudar o texto aqui
+
+    ultimaEstacao.parentElement.appendChild(marcadorFim);
+
+    marcadorFim.style.cssText = `
+        position: absolute;
+        top: 20%;
+        left: 102%; /* Ajusta a posição para a direita do final da linha */
+        transform: translate(-50%, -50%);
+        background: #222c;
+        color: #fff;
+        font-size: 11px;
+        padding: 1px 2px;
+        border-radius: 7px;
+        white-space: nowrap;
+        z-index: 5;
+        pointer-events: none;
+        font-weight: bold;
+        text-shadow: 0 1px 2px #0006;
+    `;
+}
+  // Código para inserir o marcador no início da linha
+const primeiraEstacao = document.getElementById('est1');
+
+if (primeiraEstacao) {
+    const marcadorInicio = document.createElement('div');
+    marcadorInicio.className = 'marcador-central';
+    marcadorInicio.textContent = 'X40 41'; // Você pode mudar o texto aqui
+
+    primeiraEstacao.parentElement.insertBefore(marcadorInicio, primeiraEstacao);
+
+    marcadorInicio.style.cssText = `
+        position: absolute;
+        top: 20%;
+        left: 4%;
+        transform: translate(-50%, -50%);
+        background: #222c;
+        color: #fff;
+        font-size: 11px;
+        padding: 1px 2px;
+        border-radius: 7px;
+        white-space: nowrap;
+        z-index: 5;
+        pointer-events: none;
+        font-weight: bold;
+        text-shadow: 0 1px 2px #0006;
+    `;
+}
+  // Função para inserir um marcador de texto na linha central
+function inserirMarcadorCentral(texto, estacaoAnteriorId) {
+    const estacaoAnterior = document.getElementById(estacaoAnteriorId);
+    if (!estacaoAnterior) return;
+
+    // Criar o elemento do marcador
+    const marcador = document.createElement('div');
+    marcador.className = 'marcador-central';
+    marcador.textContent = texto;
+
+    // Adiciona o marcador ao corpo do documento (ou ao contêiner principal)
+    document.body.appendChild(marcador);
+
+    // Obtém as coordenadas da estação anterior e da próxima estação
+    const estacaoAtual = estacaoAnterior.getBoundingClientRect();
+    const proximaEstacao = estacaoAnterior.nextElementSibling ? estacaoAnterior.nextElementSibling.getBoundingClientRect() : null;
+
+    if (!proximaEstacao) return;
+
+    // Calcula a posição central entre as estações
+    const centroX = (estacaoAtual.right + proximaEstacao.left) / 2;
+    const centroY = (estacaoAtual.top + proximaEstacao.top) / 2;
+
+    // Ajusta o estilo para posicionar o marcador
+    marcador.style.cssText = `
+        position: absolute;
+        left: ${centroX}px;
+        top: ${centroY +95}px;
+        transform: translate(-50%, -50%);
+        background: #222c;
+        color: #fff;
+        font-size: 11px;
+        padding: 1px 2px;
+        border-radius: 7px;
+        white-space: nowrap;
+        z-index: 5;
+        pointer-events: none;
+        font-weight: bold;
+        text-shadow: 0 1px 2px #0006;
+    `;
+}
+// Adiciona o marcador "X" em cada segmento da Via 1
+inserirMarcadorCentral('X 42 43 44', 'est1');
+inserirMarcadorCentral('X 45 45P', 'est4');
+inserirMarcadorCentral('X 46', 'est5');
+inserirMarcadorCentral('X 47', 'est6');
+inserirMarcadorCentral('X 48', 'est7');
+
+
+inserirMarcadorCentral('X 49', 'est10');
+inserirMarcadorCentral('X 50', 'est11');
+inserirMarcadorCentral('X 51', 'est13');
+
+inserirMarcadorCentral('X 52', 'est16');
 // 24 trens, já prontos para serem espalhados com cores ajustadas
 // ===============
 const trens = Array.from({
