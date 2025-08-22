@@ -270,7 +270,7 @@
     <div class="via-label">Via 1 - Capão Redondo ⬅ Chácara Klabin</div>
     <div class="linha-container">
       <div class="linha" id="linha-estacoes">
-        <div class="estacao" id="est1">Capão<br>Redondo<br>🔁1</div>
+        <div class="estacao" id="est1">Capão<br>Redondo<br>1</div>
         <div class="estacao" id="est2">Campo<br>Limpo</div>
         <div class="estacao" id="est3">Vila das<br>Belezas</div>
         <div class="estacao" id="est4">Giovanni<br>Gronchi</div>
@@ -291,7 +291,7 @@
     </div>
   <div class="linha-container">
       <div class="linha" id="linha-estacoes-via2">
-        <div class="estacao" id="est1-v2">Capão<br>Redondo<br>🔁2</div>
+        <div class="estacao" id="est1-v2">Capão<br>Redondo<br>2</div>
         <div class="estacao" id="est2-v2">Campo<br>Limpo</div>
         <div class="estacao" id="est3-v2">Vila das<br>Belezas</div>
         <div class="estacao" id="est4-v2">Giovanni<br>Gronchi</div>
@@ -315,7 +315,7 @@
     <div id="status-trens" class="status-container"></div>
     <div class="tempo" id="tempo">Tempo total: 0s</div>
 <div id="pote-counter" style="margin: 10px 0; font-size: 18px; font-weight: bold;">
-    Trens operando - POTE: <span id="pote-value">0</span>/24
+    Trens operando - POT: <span id="pote-value">0</span>/24
 </div>
     <div class="controls">
       <button class="btn-iniciar" onclick="iniciarTrens()">Iniciar Trens</button>
@@ -469,13 +469,13 @@ const ultimaEstacao = document.getElementById('est17');
 if (ultimaEstacao) {
     const marcadorFim = document.createElement('div');
     marcadorFim.className = 'marcador-central';
-    marcadorFim.textContent = 'CBT'; // Você pode mudar o texto aqui
+    marcadorFim.textContent = 'X 53'; // Você pode mudar o texto aqui
 
     ultimaEstacao.parentElement.appendChild(marcadorFim);
 
     marcadorFim.style.cssText = `
         position: absolute;
-        top: 20%;
+        top: 14.4%;
         left: 102%; /* Ajusta a posição para a direita do final da linha */
         transform: translate(-50%, -50%);
         background: #222c;
@@ -502,8 +502,8 @@ if (primeiraEstacao) {
 
     marcadorInicio.style.cssText = `
         position: absolute;
-        top: 20%;
-        left: 4%;
+        top: 14.3%;
+        left: 2%;
         transform: translate(-50%, -50%);
         background: #222c;
         color: #fff;
@@ -1628,4 +1628,4 @@ window.onclick = function(e) {
     <span style="font-size: 14px; color: #444;">Simulador</span>
   </footer>
 </body>
-          </html>
+                                                       </html>
