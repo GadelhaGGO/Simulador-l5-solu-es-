@@ -420,9 +420,8 @@
       <tbody id="historico-tbody"></tbody>
     </table>
   </div>
-  // Caminho do áudio (ajustado para pasta local do usuário)
-const FALHA_AUDIO_PATH = "DANGER Alarm Sound Effects.mp3"; // Nome do arquivo na mesma pasta do HTML/script
-
+  <audio id="falha-audio" src="C:\Users\48-02687\Desktop\simulador l5 soluções\AUD-20250522-WA0000.mp3" preload="auto" controls></audio>
+  <script>
   function iniciarTrens() {
   resetarTudo();
 
@@ -853,7 +852,9 @@ let inserindoTrem = false;
 let falhaMensagem = '';
 let falhaAudioIsPlaying = false;
 
-<audio id="falha-audio" src="AUD-20250522-WA0000.mp3" preload="auto"></audio>
+// Caminho do áudio (ajustado para pasta local do usuário)
+const FALHA_AUDIO_PATH = "C:\\Users\\Moninha\\Desktop\\Nova pasta (2)\\DANGER Alarm Sound Effects.mp3"; // Nome do arquivo na mesma pasta do HTML/script
+
 // Mapeamento de falhas para soluções específicas ou aleatórias
 const solucoesFalha = {
   // Soluções para falhas de trem
@@ -1705,4 +1706,4 @@ window.onclick = function(e) {
     <span style="font-size: 14px; color: #444;">Simulador</span>
   </footer>
 </body>
-</html>
+          </html>
