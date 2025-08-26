@@ -318,6 +318,9 @@
     Trens operando - POT: <span id="pote-value">0</span>/24
 </div>
     <div class="controls">
+      <label for="potInicial" style="font-weight:bold;">POT inicial:</label>
+<input type="number" id="potInicial" min="1" max="24" value="12" style="width:60px; text-align:center; margin-right:10px;">
+
       <button class="btn-iniciar" onclick="iniciarTrens()">Iniciar Trens</button>
       <button class="btn-parar" id="btnReterTrens" onclick="toggleReterTrens()">Reter Trens</button>
       <button class="btn-normalizar" onclick="normalizarLinha()">Normalizar Linha</button>
@@ -331,12 +334,23 @@
       </select>
       <button class="btn-recolher" onclick="recolherTrem()">Recolher Trem</button>
       <button class="btn-inserir-trem" onclick="abrirInserirTrem()">Inserir Trem</button>
+
       <div id="modalInserirTrem" style="display:none; position:fixed; top:0;left:0;width:100vw;height:100vh;z-index:1000;background:#0005;">
         <div style="background:#fff;padding:20px;max-width:320px;margin:60px auto;border-radius:8px;box-shadow:0 4px 20px #0002;position:relative;">
           <h3>Inserir Trem Recolhido</h3>
           <select id="tremInserirSelect" style="margin-bottom:12px;width:100%;">
             <option value="">Selecione um trem</option>
           </select>
+          <select id="estacaoInserirSelect" style="margin-bottom:12px;width:100%;">
+  <option value="">Selecione a estação</option>
+  <option value="capao-v1">Capão Redondo - Via 1</option>
+  <option value="capao-v2">Capão Redondo - Via 2</option>
+  <option value="santo-v1">Santo Amaro - Via 1</option>
+  <option value="santo-v2">Santo Amaro - Via 2</option>
+  <option value="klabin-v1">Chácara Klabin - Via 1</option>
+  <option value="klabin-v2">Chácara Klabin - Via 2</option>
+</select>
+
           <button onclick="inserirTremRecolhido()" class="btn-inserir-trem" style="margin-right:8px;">Inserir</button>
           <button onclick="fecharInserirTrem()" style="background:#bbb;">Cancelar</button>
         </div>
@@ -383,6 +397,9 @@
       <button class="btn-falha" onclick="aplicarFalhaAleatoria()">Falha Aleatória</button>
       <button class="btn-download" onclick="baixarCSV()">Baixar Histórico CSV</button>
       <button class="btn-reset-historico" onclick="resetarTudo()">Resetar Tudo</button>
+      <button onclick="aumentarPOT()" style="background:#4CAF50; color:white;">+ Trem</button>
+<button onclick="diminuirPOT()" style="background:#F44336; color:white;">- Trem</button>
+
 <button class="btn-reset-historico" id="btnSolucao">Solução</button>
 
     </div>
@@ -405,7 +422,132 @@
   </div>
   <audio id="falha-audio" src="C:\Users\48-02687\Desktop\simulador l5 soluções\AUD-20250522-WA0000.mp3" preload="auto" controls></audio>
   <script>
+  function iniciarTrens() {
+  resetarTudo();
+
+  // Número de trens a iniciar (POT inicial)
+  const potInicial = Number(document.getElementById('potInicial').value) || 12;
+
+  // Combine todas as estações das duas vias
+  const todasEstacoes = estacoes_v2.concat(estacoes_v1);
+  const totalEstacoes = todasEstacoes.length;
+
+  // Espalhamento: calcular distância mínima entre trens
+  const minDistancia = Math.floor(totalEstacoes / potInicial) - 1;
+
+  // Posições possíveis
+  let posicoesLivres = [...todasEstacoes];
+
+  // Sorteia as posições de forma espalhada
+  let trensPosicoes = [];
+  for (let i = 0; i < potInicial; i++) {
+    // Para cada trem, escolha uma posição aleatória dentre as possíveis
+    let idx;
+    if (posicoesLivres.length === 0) break;
+    if (i === 0) {
+      // Primeiro trem: posição aleatória
+      idx = Math.floor(Math.random() * posicoesLivres.length);
+    } else {
+      // Para outros, tente garantir o espaçamento mínimo
+      let possiveis = posicoesLivres.filter((pos, pIdx) => {
+        // Checa a distância dos já colocados
+        return trensPosicoes.every(tp => {
+          let dist = Math.abs(todasEstacoes.indexOf(tp.estacao) - todasEstacoes.indexOf(pos));
+          return dist >= minDistancia;
+        });
+      });
+      if (possiveis.length === 0) possiveis = posicoesLivres; // Se não conseguir manter distância, sorteia qualquer
+      idx = Math.floor(Math.random() * possiveis.length);
+      // Corrige idx para posicoesLivres
+      idx = posicoesLivres.indexOf(possiveis[idx]);
+    }
+
+    let estacaoEscolhida = posicoesLivres[idx];
+    trensPosicoes.push({ estacao: estacaoEscolhida });
+    // Remove posições próximas do array para aumentar espaçamento
+    let posIdx = todasEstacoes.indexOf(estacaoEscolhida);
+    posicoesLivres = posicoesLivres.filter((pos) => {
+      let dist = Math.abs(todasEstacoes.indexOf(pos) - posIdx);
+      return dist > minDistancia; // remove esta e próximas
+    });
+  }
+
+  // Inicializa os trens ativos nos locais sorteados
+  trensData = [];
+  for (let i = 0; i < potInicial; i++) {
+    let trem = trens[i];
+    let estacao = trensPosicoes[i].estacao;
+
+    // Descobre a via e índice
+    let loopStep, idx;
+    if (estacoes_v2.includes(estacao)) {
+      loopStep = 0;
+      idx = estacoes_v2.indexOf(estacao);
+    } else {
+      loopStep = 1;
+      idx = estacoes_v1.indexOf(estacao);
+    }
+    trem.ativo = true;
+    trem.recolhido = false;
+    trem.falha = null;
+    trensData.push({
+      id: trem.id,
+      loopStep,
+      idx,
+      delay: 0,
+      aguardando: false,
+      tempoParado: 0,
+      tempoParadoEstacao: 0,
+      aguardandoProximoTrem: false
+    });
+  }
+
+  // Os demais trens ficam recolhidos
+  for (let i = potInicial; i < trens.length; i++) {
+    trens[i].ativo = false;
+    trens[i].recolhido = true;
+    trens[i].falha = null;
+  }
+
+  atualizarLinha();
+  atualizarTempo();
+  atualizarHistorico();
+  atualizarTremRecolherSelect();
+  atualizarTremInserirSelect();
+  mostrarFalhaInfo();
+  atualizarPOTECounter();
+
+  // Inicia o timer da simulação
+  pararTimer();
+  timer = setInterval(avancarSimulacao, 1000);
+}
   
+function aumentarPOT() {
+  // Pega o primeiro trem recolhido (se houver) e reinsere
+  if (recolhidos.length > 0) {
+    inserirTremRecolhido(recolhidos[0]);
+  } else {
+    alert("Nenhum trem disponível para adicionar.");
+  }
+}
+
+function diminuirPOT() {
+  // Recolhe o último trem ativo
+  const tremAtivo = trens.filter(t => t.ativo && !t.recolhido).pop();
+  if (tremAtivo) {
+    tremAtivo.ativo = false;
+    tremAtivo.recolhido = true;
+    trensData = trensData.filter(td => td.id !== tremAtivo.id);
+    recolhidos.push(tremAtivo.id);
+    registrarHistorico(`${tremAtivo.nome} recolhido pelo ajuste do POT`);
+    atualizarLinha();
+    atualizarTremRecolherSelect();
+    atualizarTremInserirSelect();
+    atualizarPOTECounter();
+  } else {
+    alert("Nenhum trem ativo para recolher.");
+  }
+}
 
     // ========================== 
 // Simulador Linha 5 Lilás JS (Ajuste: Áudio só para ao normalizar) 
@@ -574,7 +716,7 @@ inserirMarcadorCentral('X 52', 'est16');
 // 24 trens, já prontos para serem espalhados com cores ajustadas
 // ===============
 const trens = Array.from({
-  length: 12
+  length: 24
 }).map((_, idx) => {
   let corClass = '';
   switch (idx + 1) { // Train IDs are 1-based
@@ -949,27 +1091,8 @@ function obterPosicoesIniciaisTrens() {
 }
 
 
-function iniciarTrens() {
-  resetarTudo();
-  // Spread the 24 trens alternately across the stations of the two tracks
-  const posicoes = obterPosicoesIniciaisTrens();
-  trensData = trens.map((trem, i) => ({
-    id: trem.id,
-    loopStep: posicoes[i].loopStep,
-    idx: posicoes[i].idx,
-    delay: 0,
-    aguardando: false, // Trains start moving immediately
-    tempoParado: 0,
-    tempoParadoEstacao: 0,
-    aguardandoProximoTrem: false // New flag for waiting for next train
-  }));
-  atualizarLinha();
 
 
-  atualizarTempo();
-  timer = setInterval(avancarSimulacao, 1000);
-  registrarHistorico('Simulação iniciada');
-}
 
 
 function pararTimer() {
@@ -1264,67 +1387,40 @@ function atualizarTremInserirSelect() {
   });
 }
 
-
 function inserirTremRecolhido(tremNumToInsert = null) {
-  let tremNum;
-  if (tremNumToInsert) {
-    tremNum = tremNumToInsert;
-  } else {
-    tremNum = Number(document.getElementById('tremInserirSelect').value);
-  }
-
+  let tremNum = tremNumToInsert ? tremNumToInsert : Number(document.getElementById('tremInserirSelect').value);
+  let estacaoEscolhida = document.getElementById('estacaoInserirSelect').value;
 
   if (!tremNum) return alert('Selecione o trem para inserir');
-  const trem = trens.find(t => t.id === tremNum);
-  if (!trem || !trem.recolhido) return; // Ensure it's a valid recolhido train
+  if (!estacaoEscolhida) return alert('Selecione a estação de inserção');
 
+  const trem = trens.find(t => t.id === tremNum);
+  if (!trem || !trem.recolhido) return;
 
   trem.ativo = true;
   trem.recolhido = false;
   trem.falha = null;
 
-
-  // Find a suitable initial position for the re-inserted train
   let newLoopStep = 0;
   let newIdx = 0;
-  let positionFound = false;
 
-
-  // Try to place it at the first available position that is not occupied
-  const allPossibleInitialPositions = [];
-  for (let ls = 0; ls < LOOP.length; ls++) {
-    for (let i = 0; i < LOOP[ls].estacoes.length; i++) {
-      allPossibleInitialPositions.push({
-        loopStep: ls,
-        idx: i
-      });
-    }
+  switch (estacaoEscolhida) {
+    case "capao-v1":
+      newLoopStep = 1; newIdx = estacoes_v1.indexOf("est1"); break;
+    case "capao-v2":
+      newLoopStep = 0; newIdx = estacoes_v2.indexOf("est1-v2"); break;
+    case "santo-v1":
+      newLoopStep = 1; newIdx = estacoes_v1.indexOf("est5"); break;
+    case "santo-v2":
+      newLoopStep = 0; newIdx = estacoes_v2.indexOf("est5-v2"); break;
+    case "klabin-v1":
+      newLoopStep = 1; newIdx = estacoes_v1.indexOf("est17"); break;
+    case "klabin-v2":
+      newLoopStep = 0; newIdx = estacoes_v2.indexOf("est17-v2"); break;
+    default:
+      alert("Estação inválida"); return;
   }
 
-
-  // Sort positions to try and place trains at the start of a track first
-  allPossibleInitialPositions.sort((a, b) => a.idx - b.idx);
-
-
-  for (const pos of allPossibleInitialPositions) {
-    if (!estacaoOcupada(pos.loopStep, pos.idx, trem.id)) {
-      newLoopStep = pos.loopStep;
-      newIdx = pos.idx;
-      positionFound = true;
-      break;
-    }
-  }
-
-
-  if (!positionFound) {
-    // Fallback if all stations are unexpectedly occupied, or not enough stations
-    console.warn(`No free station found for ${trem.nome}. Placing at default (0,0).`);
-    newLoopStep = 0;
-    newIdx = 0;
-  }
-
-
-  // Add the train back to trensData
   trensData.push({
     id: trem.id,
     loopStep: newLoopStep,
@@ -1336,35 +1432,17 @@ function inserirTremRecolhido(tremNumToInsert = null) {
     aguardandoProximoTrem: false
   });
 
-
   recolhidos = recolhidos.filter(n => n !== tremNum);
-  if (!tremNumToInsert) { // Only close modal if triggered by single insert button
-    fecharInserirTrem();
-  }
-  registrarHistorico(`${trem.nome} reinserido na linha`);
-
-
+  fecharInserirTrem();
+  registrarHistorico(`${trem.nome} inserido em ${estacaoEscolhida}`);
   atualizarLinha();
   atualizarTremRecolherSelect();
   atualizarTremInserirSelect();
-  atualizarPOTECounter(); // Atualiza o contador POTE
+  atualizarPOTECounter();
 }
 
 
-function inserirTodosTrensRecolhidos() {
-  if (recolhidos.length === 0) {
-    alert('Nenhum trem recolhido para inserir.');
-    return;
-  }
 
-
-  const currentRecolhidos = [...recolhidos]; // Make a copy as recolhidos will change
-  for (const tremId of currentRecolhidos) {
-    inserirTremRecolhido(tremId); // Call the existing function for each recolhido train
-  }
-  fecharInserirTrem(); // Close the modal after inserting all
-  atualizarPOTECounter(); // Atualiza o contador POTE
-}
 
 
 function formatarEstacao(est) {
@@ -1628,4 +1706,4 @@ window.onclick = function(e) {
     <span style="font-size: 14px; color: #444;">Simulador</span>
   </footer>
 </body>
-                                                       </html>
+</html>
