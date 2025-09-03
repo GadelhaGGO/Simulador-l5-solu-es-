@@ -306,6 +306,7 @@
     <div class="via-label">Via 1 - Capão Redondo ⬅ Chácara Klabin</div>
     <div class="linha-container">
       <div class="linha" id="linha-estacoes">
+        <div class="estacao" id="est18">____</div>
         <div class="estacao" id="est1">Capão<br>Redondo<br>1</div>
         <div class="estacao" id="est2">Campo<br>Limpo</div>
         <div class="estacao" id="est3">Vila das<br>Belezas</div>
@@ -323,12 +324,14 @@
         <div class="estacao" id="est15">Hospital<br>São Paulo</div>
         <div class="estacao" id="est16">Santa<br>Cruz<br>🔁</div>
         <div class="estacao" id="est17">Chácara<br>Klabin<br>🔁 1</div>
+<div class="estacao" id="est17a">CBT</div>
       </div>
     </div>
     
     <div class="linha-container">
       <div class="linha" id="linha-estacoes-via2">
-        <div class="estacao" id="est1-v2">Capão<br>Redondo<br>2</div>
+        <div class="estacao" id="est1-v2">TM3</div>
+        <div class="estacao" id="est1a-v2">Capão<br>Redondo<br>2</div>
         <div class="estacao" id="est2-v2">Campo<br>Limpo</div>
         <div class="estacao" id="est3-v2">Vila das<br>Belezas</div>
         <div class="estacao" id="est4-v2">Giovanni<br>Gronchi</div>
@@ -344,7 +347,8 @@
         <div class="estacao" id="est14-v2">AACD<br>Servidor</div>
         <div class="estacao" id="est15-v2">Hospital<br>São Paulo</div>
         <div class="estacao" id="est16-v2">Santa<br>Cruz<br>🔁</div>
-        <div class="estacao" id="est17-v2">Chácara<br>Klabin<br>🔁2</div>
+        <div class="estacao" id="est17a-v2">Chácara<br>Klabin<br>🔁2</div>
+<div class="estacao" id="est17-v2">CBT</div>
       </div>
     </div>
     
@@ -358,107 +362,83 @@
     </div>
     
     <div class="controls">
-      <label for="potInicial" style="font-weight:bold;">POT inicial:</label>
-      <input type="number" id="potInicial" min="1" max="24" value="12" style="width:60px; text-align:center; margin-right:10px;">
-
-      <button class="btn-iniciar" onclick="iniciarTrens()">Iniciar Trens</button>
-      <button class="btn-parar" id="btnReterTrens" onclick="toggleReterTrens()">Reter Trens</button>
-      <button class="btn-normalizar" onclick="normalizarLinha()">Normalizar Linha</button>
-      
-      <select id="tremRecolherSelect">
-        <option value="">Selecione o trem</option>
-        <option value="1">Trem 1</option>
-        <option value="2">Trem 2</option>
-        <option value="3">Trem 3</option>
-        <option value="4">Trem 4</option>
-        <option value="5">Trem 5</option>
-      </select>
-      
-      <select id="estacaoRecolherSelect" style="margin-bottom:12px;width:100%;">
-        <option value="">Selecione a estação</option>
-        <option value="capao-v1">Capão Redondo - Via 1</option>
-        <option value="capao-v2">Capão Redondo - Via 2</option>
-        <option value="santo-v1">Santo Amaro - Via 1</option>
-        <option value="santo-v2">Santo Amaro - Via 2</option>
-        <option value="klabin-v1">Chácara Klabin - Via 1</option>
-        <option value="klabin-v2">Chácara Klabin - Via 2</option>
-      </select>
-
-      <button class="btn-recolher" onclick="recolherTrem()">Recolher Trem</button>
-      
-      <button class="btn-inserir-trem" onclick="abrirInserirTrem()">Inserir Trem</button>
-
-      <div id="modalInserirTrem" style="display:none; position:fixed; top:0;left:0;width:100vw;height:100vh;z-index:1000;background:#0005;">
-        <div style="background:#fff;padding:20px;max-width:320px;margin:60px auto;border-radius:8px;box-shadow:0 4px 20px #0002;position:relative;">
-          <h3>Inserir Trem Recolhido</h3>
-          <select id="tremInserirSelect" style="margin-bottom:12px;width:100%;">
-            <option value="">Selecione um trem</option>
-          </select>
-          <select id="estacaoInserirSelect" style="margin-bottom:12px;width:100%;">
-            <option value="">Selecione a estação</option>
-            <option value="capao-v1">Capão Redondo - Via 1</option>
-            <option value="capao-v2">Capão Redondo - Via 2</option>
-            <option value="santo-v1">Santo Amaro - Via 1</option>
-            <option value="santo-v2">Santo Amaro - Via 2</option>
-            <option value="klabin-v1">Chácara Klabin - Via 1</option>
-            <option value="klabin-v2">Chácara Klabin - Via 2</option>
-          </select>
-
-          <button onclick="inserirTremRecolhido()" class="btn-inserir-trem" style="margin-right:8px;">Inserir</button>
-          <button onclick="fecharInserirTrem()" style="background:#bbb;">Cancelar</button>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <label for="potInicial" style="font-weight:bold; width: 150px;">POT inicial:</label>
+            <input type="number" id="potInicial" min="1" max="24" value="12" style="width: 150px; text-align:center;">
+            <button class="btn-iniciar" onclick="iniciarTrens()" style="width: 150px;">Iniciar Trens</button>
+            <button class="btn-reset-historico" onclick="resetarTudo()" style="width: 150px;">Resetar Tudo</button>
+            <button class="btn-parar" id="btnReterTrens" onclick="toggleReterTrens()" style="width: 150px;">Reter Trens</button>
+            <button class="btn-normalizar" onclick="normalizarLinha()" style="width: 150px;">Normalizar Linha</button>
         </div>
-      </div>
-      
-      <select id="falhaTipoSelect">
-        <option value="estacao">Falha no Trem</option>
-        <option value="trem1">Falha no Trem 1</option>
-        <option value="2">Falha no Trem 2</option>
-        <option value="3">Falha no Trem 3</option>
-        <option value="4">Falha no Trem 4</option>
-        <option value="5">Falha no Trem 5</option>
-      </select>
-
-      <select id="falhaSelect">
-        <option value="">Selecione uma estação</option>
-        <option value="est1">Capão Redondo</option>
-        <option value="est2">Campo Limpo</option>
-        <option value="est3">Vila das Belezas</option>
-        <option value="est4">Giovanni Gronchi</option>
-        <option value="est5">Santo Amaro</option>
-        <option value="est6">Largo Treze</option>
-        <option value="est7">Adolfo Pinheiro</option>
-        <option value="est8">Alto da Boa Vista</option>
-        <option value="est9">Borba Gato</option>
-        <option value="est10">Brooklin</option>
-        <option value="est11">Campo Belo</option>
-        <option value="est12">Eucaliptos</option>
-        <option value="est13">Moema</option>
-        <option value="est14">AACD Servidor</option>
-        <option value="est15">Hospital São Paulo</option>
-        <option value="est16">Santa Cruz</option>
-        <option value="est17">Chácara Klabin</option>
-      </select>
-
-      <select id="falhaEstacaoTipo">
-        <option value="">Tipo de falha na estação</option>
-      </select>
-
-      <select id="falhaTremTipo">
-        <option value="">Tipo de falha no trem</option>
-      </select>
-
-      <button class="btn-falha" onclick="aplicarFalha()">Aplicar Falha</button>
-      <button class="btn-falha" onclick="aplicarFalhaAleatoria()">Falha Aleatória</button>
-      <button class="btn-download" onclick="baixarCSV()">Baixar Histórico CSV</button>
-      <button class="btn-reset-historico" onclick="resetarTudo()">Resetar Tudo</button>
-      
-      <button onclick="aumentarPOT()" style="background:#4CAF50; color:white;">+ Trem</button>
-      <button onclick="diminuirPOT()" style="background:#F44336; color:white;">- Trem</button>
-
-      <button class="btn-reset-historico" id="btnSolucao">Solução</button>
+    
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
+            <button class="btn-inserir-trem" onclick="abrirInserirTrem()" style="width: 150px;">Inserir Trem</button>
+            <button class="btn-recolher" onclick="recolherTrem()" style="width: 150px;">Recolher Trem</button>
+            <select id="tremRecolherSelect" style="width: 150px;">
+                <option value="">Selecione o trem</option>
+            </select>
+            <select id="estacaoRecolherSelect" style="width: 150px;">
+                <option value="">Selecione a estação</option>
+                <option value="capao-v1">Capão Redondo - Via 1</option>
+                <option value="capao-v2">Capão Redondo - Via 2</option>
+                <option value="santo-v1">Santo Amaro - Via 1</option>
+                <option value="santo-v2">Santo Amaro - Via 2</option>
+                <option value="klabin-v1">Chácara Klabin - Via 1</option>
+                <option value="klabin-v2">Chácara Klabin - Via 2</option>
+            </select>
+        </div>
+    
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
+            <select id="falhaTipoSelect" style="width: 150px;">
+                <option value="">Falha</option>
+                <option value="trem">Falha no Trem</option>
+                <option value="estacao">Falha na Estação</option>
+            </select>
+            <select id="falhaSelect" style="width: 150px;">
+                <option value="">Tipo de falha</option>
+            </select>
+            <select id="falhaTremTipo" style="width: 150px; display: none;">
+                <option value="">Tipo de falha no trem</option>
+            </select>
+            <select id="falhaEstacaoTipo" style="width: 150px; display: none;">
+                <option value="">Tipo de falha na estação</option>
+            </select>
+        </div>
+    
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
+            <button class="btn-falha" onclick="aplicarFalha()" style="width: 150px;">Aplicar Falha</button>
+            <button class="btn-falha" onclick="aplicarFalhaAleatoria()" style="width: 150px;">Falha Aleatória</button>
+            <button class="btn-reset-historico" id="btnSolucao" onclick="solucionarFalha()" style="width: 150px;">Solução</button>
+            <button class="btn-download" onclick="baixarCSV()" style="width: 150px;">Baixar Histórico CSV</button>
+        </div>
+    
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
+            <button onclick="aumentarPOT()" style="background:#4CAF50; color:white; width: 150px;">+ Trem</button>
+            <button onclick="diminuirPOT()" style="background:#F44336; color:white; width: 150px;">- Trem</button>
+        </div>
     </div>
     
     <div class="falha-info" id="falha-info"></div>
+
+    <div id="modalInserirTrem" style="display:none; position:fixed; top:0;left:0;width:100vw;height:100vh;z-index:1000;background:#0005;">
+        <div style="background:#fff;padding:20px;max-width:320px;margin:60px auto;border-radius:8px;box-shadow:0 4px 20px #0002;position:relative;">
+            <h3>Inserir Trem Recolhido</h3>
+            <select id="tremInserirSelect" style="margin-bottom:12px;width:100%;">
+                <option value="">Selecione um trem</option>
+            </select>
+            <select id="estacaoInserirSelect" style="margin-bottom:12px;width:100%;">
+                <option value="">Selecione a estação</option>
+                <option value="capao-v1">Capão Redondo - Via 1</option>
+                <option value="capao-v2">Capão Redondo - Via 2</option>
+                <option value="santo-v1">Santo Amaro - Via 1</option>
+                <option value="santo-v2">Santo Amaro - Via 2</option>
+                <option value="klabin-v1">Chácara Klabin - Via 1</option>
+                <option value="klabin-v2">Chácara Klabin - Via 2</option>
+            </select>
+            <button onclick="inserirTremRecolhido()" class="btn-inserir-trem" style="margin-right:8px;">Inserir</button>
+            <button onclick="fecharInserirTrem()" style="background:#bbb;">Cancelar</button>
+        </div>
+    </div>
   </div>
   
   <div class="historico-container">
@@ -476,8 +456,9 @@
       <tbody id="historico-tbody"></tbody>
     </table>
   </div>
+  
   <audio id="falha-audio" src="AUD-20250522-WA0000.mp3" preload="auto" controls></audio>
-
+  
   <script>
   // ========================== 
   // Simulador Linha 5 Lilás JS
@@ -496,7 +477,7 @@
     "Mal súbito de passageiro", "Queda de energia", "Passageiro perdido no sistema", "Codigo A", 
     "Incêndio na estação", "Portões de plataforma com problema", "Inundação", "Problema na escada rolante", 
     "Acesso bloqueado", "Fumaça na plataforma", "Alarme falso de incêndio", "Vazamento de água", 
-    "Problema na bilheteria", "Pichação", "Esgoto entupido", "Sistema de som inoperante", 
+    "Problema na bilheteria", "Pichação", "Esgoto entupido", "falha de PDM", 
     "Alarme de emergência ativado", "Sem luz na estação", "Ataque de abelhas", "Problema no elevador"
   ];
   
@@ -528,11 +509,13 @@
     };
   });
   
-  const estacoes_v2 = [
-    "est1-v2", "est2-v2", "est3-v2", "est4-v2", "est5-v2", "est6-v2", "est7-v2",
-    "est8-v2", "est9-v2", "est10-v2", "est11-v2", "est12-v2", "est13-v2", "est14-v2", "est15-v2", "est16-v2", "est17-v2"
-  ];
-  
+const estacoes_v2 = [
+  "est1-v2", "est1a-v2", "est2-v2", "est3-v2", "est4-v2",
+  "est5-v2", "est6-v2", "est7-v2", "est8-v2", "est9-v2",
+  "est10-v2", "est11-v2", "est12-v2", "est13-v2", "est14-v2",
+  "est15-v2", "est16-v2", "est17a-v2", "est17-v2"
+];
+
   const estacoes_v1 = [
     "est17", "est16", "est15", "est14", "est13", "est12", "est11", "est10", "est9", "est8", "est7", "est6", "est5", "est4", "est3", "est2", "est1"
   ];
@@ -933,86 +916,67 @@ inserirMarcadorCentral('X 52', 'est16');
   // ==========================
   
   function iniciarTrens() {
-    resetarTudo();
-    const potInicial = Number(document.getElementById('potInicial').value) || 12;
-    const todasEstacoes = estacoes_v2.concat(estacoes_v1);
-    const totalEstacoes = todasEstacoes.length;
-    const minDistancia = Math.floor(totalEstacoes / potInicial) - 1;
-    let posicoesLivres = [...todasEstacoes];
-    let trensPosicoes = [];
-    
-    for (let i = 0; i < potInicial; i++) {
-      let idx;
-      if (posicoesLivres.length === 0) break;
-      if (i === 0) {
-        idx = Math.floor(Math.random() * posicoesLivres.length);
-      } else {
-        let possiveis = posicoesLivres.filter((pos, pIdx) => {
-          return trensPosicoes.every(tp => {
-            let dist = Math.abs(todasEstacoes.indexOf(tp.estacao) - todasEstacoes.indexOf(pos));
-            return dist >= minDistancia;
-          });
-        });
-        if (possiveis.length === 0) possiveis = posicoesLivres;
-        idx = Math.floor(Math.random() * possiveis.length);
-        idx = posicoesLivres.indexOf(possiveis[idx]);
-      }
+  resetarTudo();
+  const potInicial = Number(document.getElementById('potInicial').value) || 12;
+  const todasEstacoes = estacoes_v2.concat(estacoes_v1);
+  let posicoesLivres = [...todasEstacoes];
+  let trensPosicoes = [];
 
-      let estacaoEscolhida = posicoesLivres[idx];
-      trensPosicoes.push({ estacao: estacaoEscolhida });
-      let posIdx = todasEstacoes.indexOf(estacaoEscolhida);
-      posicoesLivres = posicoesLivres.filter((pos) => {
-        let dist = Math.abs(todasEstacoes.indexOf(pos) - posIdx);
-        return dist > minDistancia;
-      });
-    }
-
-    trensData = [];
-    for (let i = 0; i < potInicial; i++) {
-      let trem = trens[i];
-      let estacao = trensPosicoes[i].estacao;
-      let loopStep, idx;
-      
-      if (estacoes_v2.includes(estacao)) {
-        loopStep = 0;
-        idx = estacoes_v2.indexOf(estacao);
-      } else {
-        loopStep = 1;
-        idx = estacoes_v1.indexOf(estacao);
-      }
-      
-      trem.ativo = true;
-      trem.recolhido = false;
-      trem.falha = null;
-      trensData.push({
-        id: trem.id,
-        loopStep,
-        idx,
-        delay: 0,
-        aguardando: false,
-        tempoParado: 0,
-        tempoParadoEstacao: 0,
-        aguardandoProximoTrem: false
-      });
-    }
-
-    for (let i = potInicial; i < trens.length; i++) {
-      trens[i].ativo = false;
-      trens[i].recolhido = true;
-      trens[i].falha = null;
-    }
-
-    atualizarLinha();
-    atualizarTempo();
-    atualizarHistorico();
-    atualizarTremRecolherSelect();
-    atualizarTremInserirSelect();
-    mostrarFalhaInfo();
-    atualizarPOTECounter();
-
-    pararTimer();
-    timer = setInterval(avancarSimulacao, 1000);
+  // Distribuição rápida sem cálculo de espaçamento mínimo
+  for (let i = 0; i < potInicial; i++) {
+    if (posicoesLivres.length === 0) break;
+    let idx = Math.floor(Math.random() * posicoesLivres.length);
+    let estacaoEscolhida = posicoesLivres[idx];
+    trensPosicoes.push({ estacao: estacaoEscolhida });
+    posicoesLivres = posicoesLivres.filter((pos) => pos !== estacaoEscolhida);
   }
+
+  trensData = [];
+  for (let i = 0; i < potInicial; i++) {
+    let trem = trens[i];
+    let estacao = trensPosicoes[i].estacao;
+    let loopStep, idx;
+
+    if (estacoes_v2.includes(estacao)) {
+      loopStep = 0;
+      idx = estacoes_v2.indexOf(estacao);
+    } else {
+      loopStep = 1;
+      idx = estacoes_v1.indexOf(estacao);
+    }
+
+    trem.ativo = true;
+    trem.recolhido = false;
+    trem.falha = null;
+    trensData.push({
+      id: trem.id,
+      loopStep,
+      idx,
+      delay: 0,
+      aguardando: false,
+      tempoParado: 0,
+      tempoParadoEstacao: 0,
+      aguardandoProximoTrem: false
+    });
+  }
+
+  for (let i = potInicial; i < trens.length; i++) {
+    trens[i].ativo = false;
+    trens[i].recolhido = true;
+    trens[i].falha = null;
+  }
+
+  atualizarLinha();
+  atualizarTempo();
+  atualizarHistorico();
+  atualizarTremRecolherSelect();
+  atualizarTremInserirSelect();
+  mostrarFalhaInfo();
+  atualizarPOTECounter();
+
+  pararTimer();
+  timer = setInterval(avancarSimulacao, 1000);
+}
 
   function aumentarPOT() {
     if (recolhidos.length > 0) {
@@ -1117,8 +1081,42 @@ inserirMarcadorCentral('X 52', 'est16');
   }
 
   function aplicarFalha() {
-    falha();
+    const falhaTipo = document.getElementById('falhaTipoSelect').value;
+    const falhaSelect = document.getElementById('falhaSelect').value;
+
+    if (falhaTipo === "estacao" && falhaSelect) {
+        falhaEstacao = falhaSelect;
+        falhaEstacaoTipo = document.getElementById('falhaEstacaoTipo').value;
+        if (!falhaEstacaoTipo) {
+            alert("Selecione um tipo de falha de estação.");
+            return;
+        }
+        falhaMensagem = `Falha em estação: ${formatarEstacao(falhaEstacao)} - ${falhaEstacaoTipo}`;
+        registrarHistorico(falhaMensagem);
+        tocarAudioFalhaLoop();
+    } else if (falhaTipo === "trem" && falhaSelect) {
+        const tremId = Number(falhaSelect.replace('trem', ''));
+        const trem = trens.find(t => t.id === tremId);
+        falhaTremTipo = document.getElementById('falhaTremTipo').value;
+        if (!falhaTremTipo) {
+            alert("Selecione um tipo de falha de trem.");
+            return;
+        }
+        if (trem) {
+            trem.falha = falhaTremTipo;
+            falhaMensagem = `Falha no ${trem.nome}: ${trem.falha}`;
+            registrarHistorico(falhaMensagem);
+            tocarAudioFalhaLoop();
+        }
+    } else {
+        alert("Selecione o tipo de falha e a falha específica.");
+        return;
+    }
+
+    mostrarFalhaInfo();
+    atualizarLinha();
   }
+
 
   function aplicarFalhaAleatoria() {
     if (Math.random() < 0.5) {
@@ -1129,10 +1127,10 @@ inserirMarcadorCentral('X 52', 'est16');
       falhaMensagem = `Falha aleatória em ${formatarEstacao(falhaEstacao)}: ${falhaEstacaoTipo}`;
       registrarHistorico(`Falha aleatória estação: ${formatarEstacao(falhaEstacao)} (${falhaEstacaoTipo})`);
     } else {
-      const tremId = Math.floor(Math.random() * trens.length) + 1;
-      const tipoIdx = Math.floor(Math.random() * falhasTremTextos.length);
-      let trem = trens.find(t => t.id === tremId);
+      const tremId = Math.floor(Math.random() * trens.filter(t => t.ativo).length);
+      let trem = trens.filter(t => t.ativo)[tremId];
       if (trem) {
+        const tipoIdx = Math.floor(Math.random() * falhasTremTextos.length);
         trem.falha = falhasTremTextos[tipoIdx];
         falhaMensagem = `Falha aleatória no ${trem.nome}: ${falhasTremTextos[tipoIdx]}`;
         registrarHistorico(`Falha aleatória ${trem.nome}: ${falhasTremTextos[tipoIdx]}`);
@@ -1249,7 +1247,8 @@ inserirMarcadorCentral('X 52', 'est16');
 
   function formatarEstacao(est) {
     switch (est.replace('-v2', '')) {
-      case 'est1': return 'Capão Redondo';
+case 'est1': return 'TM3';
+      case 'est1a': return 'Capão Redondo';
       case 'est2': return 'Campo Limpo';
       case 'est3': return 'Vila das Belezas';
       case 'est4': return 'Giovanni Gronchi';
@@ -1265,7 +1264,8 @@ inserirMarcadorCentral('X 52', 'est16');
       case 'est14': return 'AACD Servidor';
       case 'est15': return 'Hospital São Paulo';
       case 'est16': return 'Santa Cruz';
-      case 'est17': return 'Chácara Klabin';
+      case 'est17a': return 'Chácara Klabin';
+case 'est17': return 'CBT';
       default: return est;
     }
   }
@@ -1320,42 +1320,6 @@ inserirMarcadorCentral('X 52', 'est16');
     document.getElementById('falha-info').style.color = '#f44336';
   }
 
-  function falha() {
-    const tipo = document.getElementById('falhaTipoSelect').value;
-    if (tipo === 'estacao') {
-      const est = document.getElementById('falhaSelect').value;
-      const tipoFalhaEst = document.getElementById('falhaEstacaoTipo').value;
-      if (!est || !tipoFalhaEst) {
-        alert('Selecione a estação e o tipo de falha');
-        return;
-      }
-      falhaEstacao = est;
-      falhaEstacaoTipo = tipoFalhaEst;
-      falhaMensagem = `Falha em estação: ${formatarEstacao(est)} - ${tipoFalhaEst}`;
-      tocarAudioFalhaLoop();
-      registrarHistorico(`Falha em estação: ${formatarEstacao(est)} (${tipoFalhaEst})`);
-    } else if (tipo && tipo.startsWith('trem')) {
-      const tremId = Number(tipo.replace('trem', ''));
-      const tipoFalhaTrem = document.getElementById('falhaTremTipo').value;
-      if (!tremId || !tipoFalhaTrem) {
-        alert('Selecione um trem e tipo de falha');
-        return;
-      }
-      let trem = trens.find(t => t.id === tremId);
-      if (trem) {
-        trem.falha = tipoFalhaTrem;
-        falhaMensagem = `Falha no ${trem.nome}: ${tipoFalhaTrem}`;
-        tocarAudioFalhaLoop();
-        registrarHistorico(`Falha no ${trem.nome}: ${tipoFalhaTrem}`);
-      }
-    } else {
-      alert('Selecione o tipo de falha');
-      return;
-    }
-    mostrarFalhaInfo();
-    atualizarLinha();
-  }
-
   function solucionarFalha() {
     const tremComFalha = trens.find(t => t.falha !== null);
     if (tremComFalha) {
@@ -1387,33 +1351,46 @@ inserirMarcadorCentral('X 52', 'est16');
     const trensOperando = trens.filter(t => t.ativo && !t.recolhido).length;
     document.getElementById('pote-value').textContent = trensOperando;
   }
+  
+  // Event Listeners para atualizar os selects de falha
+  document.getElementById('falhaTipoSelect').addEventListener('change', function() {
+      const tipo = this.value;
+      const falhaSelect = document.getElementById('falhaSelect');
+      const falhaTremTipo = document.getElementById('falhaTremTipo');
+      const falhaEstacaoTipo = document.getElementById('falhaEstacaoTipo');
+
+      // Resetar os selects de tipo e esconder
+      falhaSelect.innerHTML = '<option value="">Tipo de falha</option>';
+      falhaTremTipo.style.display = 'none';
+      falhaEstacaoTipo.style.display = 'none';
+
+      if (tipo === 'trem') {
+          falhaTremTipo.style.display = 'block';
+          falhaTremTipo.innerHTML = '<option value="">Tipo de falha no trem</option>' + falhasTremTextos.map(f => `<option value="${f}">${f}</option>`).join('');
+          falhaSelect.innerHTML = '<option value="">Selecione o trem</option>';
+          trens.filter(t => t.ativo && !t.recolhido).forEach(trem => {
+              const option = document.createElement('option');
+              option.value = `trem${trem.id}`;
+              option.textContent = trem.nome;
+              falhaSelect.appendChild(option);
+          });
+      } else if (tipo === 'estacao') {
+          falhaEstacaoTipo.style.display = 'block';
+          falhaEstacaoTipo.innerHTML = '<option value="">Tipo de falha na estação</option>' + falhasEstacaoTextos.map(f => `<option value="${f}">${f}</option>`).join('');
+          falhaSelect.innerHTML = '<option value="">Selecione a estação</option>';
+          const estacoesUnicas = Array.from(new Set(estacoes_v1.concat(estacoes_v2).map(formatarEstacao)));
+          estacoesUnicas.forEach(est => {
+              const option = document.createElement('option');
+              option.value = est;
+              option.textContent = est;
+              falhaSelect.appendChild(option);
+          });
+      }
+  });
+
 
   // Inicialização
   window.onload = function() {
-    let falhaTremTipo = document.getElementById('falhaTremTipo');
-    if (falhaTremTipo) {
-      falhaTremTipo.innerHTML = '<option value="">Tipo de falha no trem</option>' + falhasTremTextos.map(f => `<option value="${f}">${f}</option>`).join('');
-    }
-    
-    let falhaEstacaoTipo = document.getElementById('falhaEstacaoTipo');
-    if (falhaEstacaoTipo) {
-      falhaEstacaoTipo.innerHTML = '<option value="">Tipo de falha na estação</option>' + falhasEstacaoTextos.map(f => `<option value="${f}">${f}</option>`).join('');
-    }
-
-    const falhaTipoSelect = document.getElementById('falhaTipoSelect');
-    if (falhaTipoSelect) {
-      const existingOptions = Array.from(falhaTipoSelect.options).filter(opt => opt.value === 'estacao' || opt.value === '');
-      falhaTipoSelect.innerHTML = '';
-      existingOptions.forEach(opt => falhaTipoSelect.appendChild(opt));
-
-      trens.forEach(trem => {
-        const option = document.createElement('option');
-        option.value = `trem${trem.id}`;
-        option.textContent = trem.nome;
-        falhaTipoSelect.appendChild(option);
-      });
-    }
-
     atualizarLinha();
     atualizarTempo();
     atualizarHistorico();
@@ -1439,4 +1416,4 @@ inserirMarcadorCentral('X 52', 'est16');
     <span style="font-size: 14px; color: #444;">Gadelha Operador L5</span>
   </footer>
 </body>
-</html>
+  </html>
