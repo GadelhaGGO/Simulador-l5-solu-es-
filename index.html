@@ -5,6 +5,19 @@
   <title>Simulador Linha 5 Lilás</title>
   
   <style>
+  .x-falha {
+  color: #fff !important;
+  background: #f44336 !important;
+  animation: piscar 0.8s infinite alternate;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+  .trem-falha-label {
+  color: #f44336 !important;
+  animation: piscar 0.8s infinite alternate;
+}
+
     /* Container para as colunas de status */
     .status-container {
       display: flex;
@@ -457,8 +470,8 @@
     </table>
   </div>
   
-  <audio id="falha-audio" src="AUD-20250522-WA0000.mp3" preload="auto" controls></audio>
-  
+<audio id="falha-audio" src="AUD-20250522-WA0000.mp3" preload="auto" controls></audio>
+
   <script>
   // ========================== 
   // Simulador Linha 5 Lilás JS
@@ -539,9 +552,8 @@ const estacoes_v2 = [
   let falhaMensagem = '';
   let falhaAudioIsPlaying = false;
   
-  // Caminho do áudio
+  //   // Caminho do áudio
 const FALHA_AUDIO_PATH = "DANGER Alarm Sound Effects.mp3";
-
   // Mapeamento de falhas para soluções
   const solucoesFalha = {
     "Botão soco": "Acionar o CCO e informar o carro",
@@ -852,11 +864,10 @@ inserirMarcadorCentral('X 52', 'est16');
     });
     
     if (falhaEstacao) {
-      const el = document.getElementById(falhaEstacao);
-      if (el) el.classList.add('falha');
-      const el2 = document.getElementById(falhaEstacao.replace('-v2', ''));
-      if (el2) el2.classList.add('falha');
-    }
+  const el = document.getElementById(falhaEstacao);
+  if (el) el.classList.add('falha');
+}
+
     
     let ocupacao = {};
     for (const trem of trens) {
@@ -893,8 +904,14 @@ inserirMarcadorCentral('X 52', 'est16');
         // Adiciona um indicador (R) se o trem está a caminho do recolhimento
         const recolhimentoIndicator = trem.estacaoRecolhimento ? " (R)" : "";
         numLabel.textContent = ` T ${trem.id.toString().padStart(2, '0')}${recolhimentoIndicator}`;
-        
-        el.appendChild(numLabel);
+
+// Se o trem está em falha → deixa vermelho piscando
+if (trem.falha) {
+  numLabel.classList.add("trem-falha-label");
+}
+
+el.appendChild(numLabel);
+
         
         if (trem.falha) {
           inserirParadoMsg(el, trem.falha);
@@ -979,12 +996,61 @@ inserirMarcadorCentral('X 52', 'est16');
 }
 
   function aumentarPOT() {
-    if (recolhidos.length > 0) {
-      inserirTremRecolhido(recolhidos[0]);
-    } else {
-      alert("Nenhum trem disponível para adicionar.");
-    }
+  if (recolhidos.length === 0) {
+    alert("Nenhum trem disponível para adicionar.");
+    return;
   }
+
+  // Escolhe um trem recolhido
+  const tremId = recolhidos.shift();
+  const trem = trens.find(t => t.id === tremId);
+  if (!trem) return;
+
+  // Escolhe uma estação aleatória livre
+  const todasEstacoes = estacoes_v1.concat(estacoes_v2);
+  let estacaoEscolhida;
+  let ocupadas = trensData.map(td => LOOP[td.loopStep].estacoes[td.idx]);
+
+  let livres = todasEstacoes.filter(e => !ocupadas.includes(e));
+  if (livres.length === 0) {
+    alert("Nenhuma estação livre para inserir trem.");
+    return;
+  }
+
+  estacaoEscolhida = livres[Math.floor(Math.random() * livres.length)];
+
+  // Define a via e índice
+  let newLoopStep, newIdx;
+  if (estacoes_v2.includes(estacaoEscolhida)) {
+    newLoopStep = 0;
+    newIdx = estacoes_v2.indexOf(estacaoEscolhida);
+  } else {
+    newLoopStep = 1;
+    newIdx = estacoes_v1.indexOf(estacaoEscolhida);
+  }
+
+  // Ativa o trem
+  trem.ativo = true;
+  trem.recolhido = false;
+  trem.falha = null;
+
+  trensData.push({
+    id: trem.id,
+    loopStep: newLoopStep,
+    idx: newIdx,
+    delay: 0,
+    aguardando: false,
+    tempoParado: 0,
+    tempoParadoEstacao: 0,
+    aguardandoProximoTrem: false
+  });
+
+  registrarHistorico(`${trem.nome} inserido aleatoriamente em ${formatarEstacao(estacaoEscolhida)}`);
+  atualizarLinha();
+  atualizarTremRecolherSelect();
+  atualizarTremInserirSelect();
+  atualizarPOTECounter();
+}
 
   function diminuirPOT() {
     const tremAtivo = trens.filter(t => t.ativo && !t.recolhido).pop();
@@ -1375,17 +1441,29 @@ case 'est17': return 'CBT';
               falhaSelect.appendChild(option);
           });
       } else if (tipo === 'estacao') {
-          falhaEstacaoTipo.style.display = 'block';
-          falhaEstacaoTipo.innerHTML = '<option value="">Tipo de falha na estação</option>' + falhasEstacaoTextos.map(f => `<option value="${f}">${f}</option>`).join('');
-          falhaSelect.innerHTML = '<option value="">Selecione a estação</option>';
-          const estacoesUnicas = Array.from(new Set(estacoes_v1.concat(estacoes_v2).map(formatarEstacao)));
-          estacoesUnicas.forEach(est => {
-              const option = document.createElement('option');
-              option.value = est;
-              option.textContent = est;
-              falhaSelect.appendChild(option);
-          });
-      }
+    falhaEstacaoTipo.style.display = 'block';
+    falhaEstacaoTipo.innerHTML = '<option value="">Tipo de falha na estação</option>' + 
+        falhasEstacaoTextos.map(f => `<option value="${f}">${f}</option>`).join('');
+
+    falhaSelect.innerHTML = '<option value="">Selecione a estação</option>';
+
+    // Adiciona opções para Via 1
+    estacoes_v1.forEach(est => {
+        const option = document.createElement('option');
+        option.value = est; // mantém o id exato (ex: est5)
+        option.textContent = formatarEstacao(est) + " (Via 1)";
+        falhaSelect.appendChild(option);
+    });
+
+    // Adiciona opções para Via 2
+    estacoes_v2.forEach(est => {
+        const option = document.createElement('option');
+        option.value = est; // mantém o id exato (ex: est5-v2)
+        option.textContent = formatarEstacao(est) + " (Via 2)";
+        falhaSelect.appendChild(option);
+    });
+}
+
   });
 
 
@@ -1416,4 +1494,4 @@ case 'est17': return 'CBT';
     <span style="font-size: 14px; color: #444;">Gadelha Operador L5</span>
   </footer>
 </body>
-  </html>
+</html>
