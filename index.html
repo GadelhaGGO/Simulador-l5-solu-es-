@@ -18,6 +18,11 @@
   animation: piscar 0.8s infinite alternate;
 }
 
+@keyframes piscar {
+      from { opacity: 1; }
+      to { opacity: 0.7; }
+    }
+
     /* Container para as colunas de status */
     .status-container {
       display: flex;
@@ -406,6 +411,7 @@
                 <option value="">Falha</option>
                 <option value="trem">Falha no Trem</option>
                 <option value="estacao">Falha na Estação</option>
+                <option value="x">Falha de X</option>
             </select>
             <select id="falhaSelect" style="width: 150px;">
                 <option value="">Tipo de falha</option>
@@ -415,6 +421,9 @@
             </select>
             <select id="falhaEstacaoTipo" style="width: 150px; display: none;">
                 <option value="">Tipo de falha na estação</option>
+            </select>
+            <select id="falhaXTipo" style="width: 150px; display: none;">
+                <option value="">Selecione o X</option>
             </select>
         </div>
     
@@ -470,9 +479,10 @@
     </table>
   </div>
   
-<audio id="falha-audio" src="AUD-20250522-WA0000.mp3" preload="auto" controls></audio>
-
+  <audio id="falha-audio" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto" controls></audio>
+  
   <script>
+
   // ========================== 
   // Simulador Linha 5 Lilás JS
   // ========================== 
@@ -552,8 +562,9 @@ const estacoes_v2 = [
   let falhaMensagem = '';
   let falhaAudioIsPlaying = false;
   
-  //   // Caminho do áudio
-const FALHA_AUDIO_PATH = "DANGER Alarm Sound Effects.mp3";
+  // Caminho do áudio
+  const FALHA_AUDIO_PATH = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+
   // Mapeamento de falhas para soluções
   const solucoesFalha = {
     "Botão soco": "Acionar o CCO e informar o carro",
@@ -599,61 +610,10 @@ const FALHA_AUDIO_PATH = "DANGER Alarm Sound Effects.mp3";
     registrarHistorico(`${trem.nome} será recolhido em ${formatarNomeEstacaoRecolhimento(estacaoRecolher)}`);
     
     atualizarLinha();
+ 
   }
- // Código para inserir o marcador no final da linha
-const ultimaEstacao = document.getElementById('est17');
+ 
 
-if (ultimaEstacao) {
-    const marcadorFim = document.createElement('div');
-    marcadorFim.className = 'marcador-central';
-    marcadorFim.textContent = 'X 53'; // Você pode mudar o texto aqui
-
-    ultimaEstacao.parentElement.appendChild(marcadorFim);
-
-    marcadorFim.style.cssText = `
-        position: absolute;
-        top: 14.4%;
-        left: 102%; /* Ajusta a posição para a direita do final da linha */
-        transform: translate(-50%, -50%);
-        background: #222c;
-        color: #fff;
-        font-size: 11px;
-        padding: 1px 2px;
-        border-radius: 7px;
-        white-space: nowrap;
-        z-index: 5;
-        pointer-events: none;
-        font-weight: bold;
-        text-shadow: 0 1px 2px #0006;
-    `;
-}
-  // Código para inserir o marcador no início da linha
-const primeiraEstacao = document.getElementById('est1');
-
-if (primeiraEstacao) {
-    const marcadorInicio = document.createElement('div');
-    marcadorInicio.className = 'marcador-central';
-    marcadorInicio.textContent = 'X40 41'; // Você pode mudar o texto aqui
-
-    primeiraEstacao.parentElement.insertBefore(marcadorInicio, primeiraEstacao);
-
-    marcadorInicio.style.cssText = `
-        position: absolute;
-        top: 14.3%;
-        left: 2%;
-        transform: translate(-50%, -50%);
-        background: #222c;
-        color: #fff;
-        font-size: 11px;
-        padding: 1px 2px;
-        border-radius: 7px;
-        white-space: nowrap;
-        z-index: 5;
-        pointer-events: none;
-        font-weight: bold;
-        text-shadow: 0 1px 2px #0006;
-    `;
-}
   // Função para inserir um marcador de texto na linha central
 function inserirMarcadorCentral(texto, estacaoAnteriorId) {
     const estacaoAnterior = document.getElementById(estacaoAnteriorId);
@@ -696,7 +656,8 @@ function inserirMarcadorCentral(texto, estacaoAnteriorId) {
     `;
 }
 // Adiciona o marcador "X" em cada segmento da Via 1
-inserirMarcadorCentral('X 42 43 44', 'est1');
+inserirMarcadorCentral('X 40 41', 'est18');
+  inserirMarcadorCentral('X 42 43 44', 'est1');
 inserirMarcadorCentral('X 45 45P', 'est4');
 inserirMarcadorCentral('X 46', 'est5');
 inserirMarcadorCentral('X 47', 'est6');
@@ -708,124 +669,141 @@ inserirMarcadorCentral('X 50', 'est11');
 inserirMarcadorCentral('X 51', 'est13');
 
 inserirMarcadorCentral('X 52', 'est16');
+  inserirMarcadorCentral('X 53', 'est17');
   // Função para avançar a simulação
-  function avancarSimulacao() {
-    tempoTotal++;
-    
-    // Primeiro, processe os trens que estão marcados para recolhimento
-    for (const trem of trens) {
-      if (trem.estacaoRecolhimento && trem.ativo && !trem.recolhido) {
-        const data = trensData.find(td => td.id === trem.id);
-        if (!data) continue;
-        
-        const estacaoAtual = LOOP[data.loopStep].estacoes[data.idx];
-        const estacaoDestino = estacoesRecolhimento[trem.estacaoRecolhimento];
-        
-        // Verifica se o trem chegou à estação de recolhimento
-        if (estacaoAtual === estacaoDestino) {
-          // Recolhe o trem
-          trem.ativo = false;
-          trem.recolhido = true;
-          trem.estacaoRecolhimento = null;
-          trensData = trensData.filter(td => td.id !== trem.id);
-          
-          if (!recolhidos.includes(trem.id)) {
-            recolhidos.push(trem.id);
-          }
-          
-          registrarHistorico(`${trem.nome} recolhido em ${formatarNomeEstacaoRecolhimento(trem.estacaoRecolhimento)}`);
-          atualizarTremRecolherSelect();
-          atualizarTremInserirSelect();
-          atualizarPOTECounter();
-        }
-      }
-    }
-    
-    // Depois, processe o movimento normal dos trens
-    for (const trem of trens) {
-      if (!trem.ativo || trem.recolhido) continue;
+
+ function avancarSimulacao() {
+  tempoTotal++;
+
+  // Primeiro, processe os trens que estão marcados para recolhimento
+  for (const trem of trens) {
+    if (trem.estacaoRecolhimento && trem.ativo && !trem.recolhido) {
       const data = trensData.find(td => td.id === trem.id);
       if (!data) continue;
 
-      data.aguardandoProximoTrem = false;
+      const estacaoAtual = LOOP[data.loopStep].estacoes[data.idx];
+      const estacaoDestino = estacoesRecolhimento[trem.estacaoRecolhimento];
 
-      if (data.delay > 0) {
-        data.delay--;
-        trem.status = `Aguardando partida (${data.delay}s)`;
-        continue;
-      }
-      
-      // Para trens a serem recolhidos, o tempo de parada é metade do normal
-      const tempoParadaEstacao = trem.estacaoRecolhimento ? 1.5 : 3;
-      
-      if (trem.falha) {
-        trem.status = `Parado por falha (${trem.falha})`;
-        continue;
-      }
-      
-      let loopStep = data.loopStep;
-      let estacoesArr = LOOP[loopStep].estacoes;
-      
-      if (falhaEstacao && estacoesArr[data.idx] === falhaEstacao) {
-        trem.status = `Parado em ${formatarEstacao(estacoesArr[data.idx])} (${falhaEstacaoTipo})`;
-        data.tempoParado++;
-        data.tempoParadoEstacao = 0;
-        continue;
-      }
-      
-      if (trensReter) {
-        trem.status = `Parado em ${formatarEstacao(estacoesArr[data.idx])} (Retido)`;
-        data.tempoParado++;
-        data.tempoParadoEstacao = 0;
-        continue;
-      }
+      if (estacaoAtual === estacaoDestino) {
+        trem.ativo = false;
+        trem.recolhido = true;
+        trem.estacaoRecolhimento = null;
+        trensData = trensData.filter(td => td.id !== trem.id);
 
-      if (!data.aguardando && proximaPosicaoOcupada(loopStep, data.idx, trem.id)) {
-        trem.status = `Aguardando liberação da próxima estação`;
-        data.tempoParadoEstacao = 0;
-        data.aguardandoProximoTrem = true;
-        continue;
-      }
-
-      if (typeof data.tempoParadoEstacao !== "number") data.tempoParadoEstacao = 0;
-      
-      if (data.tempoParadoEstacao < tempoParadaEstacao) {
-        data.tempoParadoEstacao++;
-        trem.status = `Parado na estação ${formatarEstacao(estacoesArr[data.idx])} (${Math.ceil(data.tempoParadoEstacao)}/${Math.ceil(tempoParadaEstacao)}s)`;
-        continue;
-      }
-      
-      trem.status = `Em ${formatarEstacao(estacoesArr[data.idx])}`;
-      
-      if (!data.aguardando) {
-        if (data.idx < estacoesArr.length - 1) {
-          data.idx++;
-          data.tempoParadoEstacao = 0;
-        } else {
-          data.loopStep = (data.loopStep + 1) % LOOP.length;
-          data.idx = 0;
-          trem.status = 'Aguardando retorno...';
-          data.aguardando = true;
-          data.tempoParadoEstacao = 0;
-          registrarHistorico(`${trem.nome} chegou ao fim do trecho (${LOOP[data.loopStep].via === 2 ? "Capão via 2 → Klabin via 2" : "Klabin via 1 → Capão via 1"})`);
+        if (!recolhidos.includes(trem.id)) {
+          recolhidos.push(trem.id);
         }
-      } else {
-        if (!data.retPause) data.retPause = 1;
-        else data.retPause++;
-        
-        if (data.retPause > 4) {
-          data.aguardando = false;
-          data.idx = 0;
-          data.retPause = 0;
-          data.tempoParadoEstacao = 0;
-          registrarHistorico(`${trem.nome} iniciando próximo trecho do loop`);
-        }
+
+        registrarHistorico(`${trem.nome} recolhido em ${formatarNomeEstacaoRecolhimento(estacaoRecolher)}`);
+        atualizarTremRecolherSelect();
+        atualizarTremInserirSelect();
+        atualizarPOTECounter();
       }
     }
-    
-    atualizarLinha();
-    atualizarTempo();
   }
+
+  // Depois, processe o movimento normal dos trens
+  for (const trem of trens) {
+    if (!trem.ativo || trem.recolhido) continue;
+    const data = trensData.find(td => td.id === trem.id);
+    if (!data) continue;
+
+    data.aguardandoProximoTrem = false;
+
+    // 🚦 Checagem de falha em X — trava só quem vai entrar no trecho
+    if (falhaX && falhasXmap[falhaXNome]) {
+      const estacoesBloqueadas = falhasXmap[falhaXNome];
+      const estacoesArr = LOOP[data.loopStep].estacoes;
+
+      // próxima estação que o trem tentaria acessar
+      const proximaEstacao = estacoesArr[data.idx + 1] || null;
+
+      if (proximaEstacao && estacoesBloqueadas.includes(proximaEstacao)) {
+        trem.status = `Parado próximo a ${falhaXNome}`;
+        data.tempoParado++;
+        data.tempoParadoEstacao = 0;
+        continue;
+      }
+    }
+
+    if (data.delay > 0) {
+      data.delay--;
+      trem.status = `Aguardando partida (${data.delay}s)`;
+      continue;
+    }
+
+    // Para trens a serem recolhidos, o tempo de parada é metade do normal
+    const tempoParadaEstacao = trem.estacaoRecolhimento ? 1.5 : 3;
+
+    if (trem.falha) {
+      trem.status = `Parado por falha (${trem.falha})`;
+      continue;
+    }
+
+    let loopStep = data.loopStep;
+    let estacoesArr = LOOP[loopStep].estacoes;
+
+    if (falhaEstacao && estacoesArr[data.idx] === falhaEstacao) {
+      trem.status = `Parado em ${formatarEstacao(estacoesArr[data.idx])} (${falhaEstacaoTipo})`;
+      data.tempoParado++;
+      data.tempoParadoEstacao = 0;
+      continue;
+    }
+
+    if (trensReter) {
+      trem.status = `Parado em ${formatarEstacao(estacoesArr[data.idx])} (Retido)`;
+      data.tempoParado++;
+      data.tempoParadoEstacao = 0;
+      continue;
+    }
+
+    if (!data.aguardando && proximaPosicaoOcupada(loopStep, data.idx, trem.id)) {
+      trem.status = `Aguardando liberação da próxima estação`;
+      data.tempoParadoEstacao = 0;
+      data.aguardandoProximoTrem = true;
+      continue;
+    }
+
+    if (typeof data.tempoParadoEstacao !== "number") data.tempoParadoEstacao = 0;
+
+    if (data.tempoParadoEstacao < tempoParadaEstacao) {
+      data.tempoParadoEstacao++;
+      trem.status = `Parado na estação ${formatarEstacao(estacoesArr[data.idx])} (${Math.ceil(data.tempoParadoEstacao)}/${Math.ceil(tempoParadaEstacao)}s)`;
+      continue;
+    }
+
+    trem.status = `Em ${formatarEstacao(estacoesArr[data.idx])}`;
+
+    if (!data.aguardando) {
+      if (data.idx < estacoesArr.length - 1) {
+        data.idx++;
+        data.tempoParadoEstacao = 0;
+      } else {
+        data.loopStep = (data.loopStep + 1) % LOOP.length;
+        data.idx = 0;
+        trem.status = 'Aguardando retorno...';
+        data.aguardando = true;
+        data.tempoParadoEstacao = 0;
+        registrarHistorico(`${trem.nome} chegou ao fim do trecho (${LOOP[data.loopStep].via === 2 ? "Capão via 2 → Klabin via 2" : "Klabin via 1 → Capão via 1"})`);
+      }
+    } else {
+      if (!data.retPause) data.retPause = 1;
+      else data.retPause++;
+
+      if (data.retPause > 4) {
+        data.aguardando = false;
+        data.idx = 0;
+        data.retPause = 0;
+        data.tempoParadoEstacao = 0;
+        registrarHistorico(`${trem.nome} iniciando próximo trecho do loop`);
+      }
+    }
+  }
+
+  atualizarLinha();
+  atualizarTempo();
+}
+
 
   // Função para normalizar a linha
   function normalizarLinha() {
@@ -837,6 +815,11 @@ inserirMarcadorCentral('X 52', 'est16');
         t.corOriginal = null;
       }
       t.estacaoRecolhimento = null;
+ // também limpa falha de X
+    falhaX = null;
+    falhaXNome = '';
+    document.querySelectorAll('.marcador-central.x-falha')
+      .forEach(el => el.classList.remove('x-falha'));
     }
     
     falhaEstacao = null;
@@ -856,7 +839,7 @@ inserirMarcadorCentral('X 52', 'est16');
         el.className = 'estacao';
         let c = el.childNodes;
         for (let i = c.length - 1; i >= 0; i--) {
-          if (c[i].classList && (c[i].classList.contains('trem-parado-msg') || c[i].classList.contains('trem-nome-label') || c[i].classList.contains('trem-num-label'))) {
+          if (c[i].classList && (c[i].classList.contains('trem-parado-msg') || c[i].classList.contains('trem-num-label'))) {
             el.removeChild(c[i]);
           }
         }
@@ -867,7 +850,14 @@ inserirMarcadorCentral('X 52', 'est16');
   const el = document.getElementById(falhaEstacao);
   if (el) el.classList.add('falha');
 }
-
+// Destaca/limpa o X em falha
+  document.querySelectorAll('.marcador-central').forEach(el => {
+    if (falhaX && el.textContent === falhaXNome) {
+      el.classList.add('x-falha');   // deixa piscando em vermelho
+    } else {
+      el.classList.remove('x-falha'); // remove se já tiver sido normalizado
+    }
+  });
     
     let ocupacao = {};
     for (const trem of trens) {
@@ -1148,64 +1138,97 @@ el.appendChild(numLabel);
 
   function aplicarFalha() {
     const falhaTipo = document.getElementById('falhaTipoSelect').value;
-    const falhaSelect = document.getElementById('falhaSelect').value;
-
-    if (falhaTipo === "estacao" && falhaSelect) {
+    
+    if (falhaTipo === "estacao") {
+        const falhaSelect = document.getElementById('falhaSelect').value;
+        if (!falhaSelect) { alert("Selecione uma estação."); return; }
         falhaEstacao = falhaSelect;
         falhaEstacaoTipo = document.getElementById('falhaEstacaoTipo').value;
-        if (!falhaEstacaoTipo) {
-            alert("Selecione um tipo de falha de estação.");
-            return;
-        }
+        if (!falhaEstacaoTipo) { alert("Selecione um tipo de falha de estação."); return; }
         falhaMensagem = `Falha em estação: ${formatarEstacao(falhaEstacao)} - ${falhaEstacaoTipo}`;
         registrarHistorico(falhaMensagem);
         tocarAudioFalhaLoop();
-    } else if (falhaTipo === "trem" && falhaSelect) {
+    } else if (falhaTipo === "trem") {
+        const falhaSelect = document.getElementById('falhaSelect').value;
+        if (!falhaSelect) { alert("Selecione um trem."); return; }
         const tremId = Number(falhaSelect.replace('trem', ''));
         const trem = trens.find(t => t.id === tremId);
         falhaTremTipo = document.getElementById('falhaTremTipo').value;
-        if (!falhaTremTipo) {
-            alert("Selecione um tipo de falha de trem.");
-            return;
-        }
+        if (!falhaTremTipo) { alert("Selecione um tipo de falha de trem."); return; }
         if (trem) {
             trem.falha = falhaTremTipo;
             falhaMensagem = `Falha no ${trem.nome}: ${trem.falha}`;
             registrarHistorico(falhaMensagem);
             tocarAudioFalhaLoop();
         }
+    } else if (falhaTipo === "x") {
+        const falhaXTipo = document.getElementById('falhaXTipo').value;
+        if (!falhaXTipo) { alert("Selecione um X."); return; }
+        falhaX = true;
+        falhaXNome = falhaXTipo;
+        falhaMensagem = `Falha no ${falhaXNome}`;
+        registrarHistorico(falhaMensagem);
+        tocarAudioFalhaLoop();
     } else {
-        alert("Selecione o tipo de falha e a falha específica.");
+        alert("Selecione o tipo de falha.");
         return;
     }
 
     mostrarFalhaInfo();
     atualizarLinha();
   }
+// Variáveis globais novas
+    // ==============================
+    let falhaX = null;
+    let falhaXNome = '';
 
-
+const falhasXmap = {
+  "X 40 41": ["est1", "est1-v2"],
+  "X 42 43 44": ["est1-v2", "est2-v2"], // Adicionando via 2
+  "X 45 45P": ["est4", "est5-v2"],                      // Adicionando via 2
+  "X 46": ["est5", "est6-v2"],                         // Adicionando via 2
+  "X 47": ["est6", "est7-v2"],                         // Adicionando via 2
+  "X 48": ["est7", "est8-v2"],                         // Adicionando via 2
+  "X 49": ["est10", "est11-v2"],                        // Adicionando via 2
+  "X 50": ["est11", "est12-v2"],                        // Adicionando via 2
+  "X 51": ["est13", "est14-v2"],                        // Adicionando via 2
+  "X 52": ["est16", "est17a-v2"],                        // Adicionando via 2
+  "X 53": ["est17", "est17a-v2"],                       // Adicionando via 2
+};
   function aplicarFalhaAleatoria() {
-    if (Math.random() < 0.5) {
-      const idx = Math.floor(Math.random() * estacoes_v2.length);
-      const tipoIdx = Math.floor(Math.random() * falhasEstacaoTextos.length);
-      falhaEstacao = estacoes_v2[idx];
-      falhaEstacaoTipo = falhasEstacaoTextos[tipoIdx];
-      falhaMensagem = `Falha aleatória em ${formatarEstacao(falhaEstacao)}: ${falhaEstacaoTipo}`;
-      registrarHistorico(`Falha aleatória estação: ${formatarEstacao(falhaEstacao)} (${falhaEstacaoTipo})`);
-    } else {
-      const tremId = Math.floor(Math.random() * trens.filter(t => t.ativo).length);
-      let trem = trens.filter(t => t.ativo)[tremId];
-      if (trem) {
-        const tipoIdx = Math.floor(Math.random() * falhasTremTextos.length);
-        trem.falha = falhasTremTextos[tipoIdx];
-        falhaMensagem = `Falha aleatória no ${trem.nome}: ${falhasTremTextos[tipoIdx]}`;
-        registrarHistorico(`Falha aleatória ${trem.nome}: ${falhasTremTextos[tipoIdx]}`);
+      const tipo = Math.random();
+
+      if (tipo < 0.33) {
+        // Falha em estação
+        const idx = Math.floor(Math.random() * estacoes_v2.length);
+        const tipoIdx = Math.floor(Math.random() * falhasEstacaoTextos.length);
+        falhaEstacao = estacoes_v2[idx];
+        falhaEstacaoTipo = falhasEstacaoTextos[tipoIdx];
+        falhaMensagem = `Falha aleatória em ${formatarEstacao(falhaEstacao)}: ${falhaEstacaoTipo}`;
+        registrarHistorico(`Falha aleatória estação: ${formatarEstacao(falhaEstacao)} (${falhaEstacaoTipo})`);
+      } else if (tipo < 0.66) {
+        // Falha em trem
+        const tremId = Math.floor(Math.random() * trens.filter(t => t.ativo).length);
+        let trem = trens.filter(t => t.ativo)[tremId];
+        if (trem) {
+          const tipoIdx = Math.floor(Math.random() * falhasTremTextos.length);
+          trem.falha = falhasTremTextos[tipoIdx];
+          falhaMensagem = `Falha aleatória no ${trem.nome}: ${falhasTremTextos[tipoIdx]}`;
+          registrarHistorico(`Falha aleatória ${trem.nome}: ${falhasTremTextos[tipoIdx]}`);
+        }
+      } else {
+        // Falha em X
+        const todosX = ["X 40 41", "X 42 43 44", "X 45 45P", "X 46", "X 47", "X 48", "X 49", "X 50", "X 51", "X 52", "X 53"];
+        falhaXNome = todosX[Math.floor(Math.random() * todosX.length)];
+        falhaX = true;
+        falhaMensagem = `Falha no ${falhaXNome}`;
+        registrarHistorico(`Falha aleatória ${falhaXNome}`);
       }
+
+      tocarAudioFalhaLoop();
+      mostrarFalhaInfo();
+      atualizarLinha();
     }
-    tocarAudioFalhaLoop();
-    mostrarFalhaInfo();
-    atualizarLinha();
-  }
 
   function tocarAudioFalhaLoop() {
     let audio = document.getElementById('falha-audio');
@@ -1387,6 +1410,20 @@ case 'est17': return 'CBT';
   }
 
   function solucionarFalha() {
+ if (falhaX) {
+      alert(`Solução para a falha em ${falhaXNome}:\n\nInformar ao CCO o aspecto do sinaleiro, caso autorizado seguir em manual checando rota.`);
+      registrarHistorico(
+        `Solução aplicada para ${falhaXNome}`,
+        "Informar ao CCO o aspecto do sinaleiro, caso autorizado seguir em manual checando rota."
+      );
+      falhaX = null;
+      falhaXNome = '';
+      pararAudioFalha();
+      falhaMensagem = '';
+      mostrarFalhaInfo();
+      atualizarLinha();
+      return;
+    }
     const tremComFalha = trens.find(t => t.falha !== null);
     if (tremComFalha) {
       const falhaTipo = tremComFalha.falha;
@@ -1424,12 +1461,14 @@ case 'est17': return 'CBT';
       const falhaSelect = document.getElementById('falhaSelect');
       const falhaTremTipo = document.getElementById('falhaTremTipo');
       const falhaEstacaoTipo = document.getElementById('falhaEstacaoTipo');
+      const falhaXTipo = document.getElementById('falhaXTipo');
 
       // Resetar os selects de tipo e esconder
       falhaSelect.innerHTML = '<option value="">Tipo de falha</option>';
       falhaTremTipo.style.display = 'none';
       falhaEstacaoTipo.style.display = 'none';
-
+      falhaXTipo.style.display = 'none';
+      
       if (tipo === 'trem') {
           falhaTremTipo.style.display = 'block';
           falhaTremTipo.innerHTML = '<option value="">Tipo de falha no trem</option>' + falhasTremTextos.map(f => `<option value="${f}">${f}</option>`).join('');
@@ -1462,8 +1501,17 @@ case 'est17': return 'CBT';
         option.textContent = formatarEstacao(est) + " (Via 2)";
         falhaSelect.appendChild(option);
     });
-}
-
+} else if (tipo === 'x') {
+        falhaXTipo.style.display = 'block';
+        falhaXTipo.innerHTML = '<option value="">Selecione o X</option>';
+        Object.keys(falhasXmap).forEach(xName => {
+            const option = document.createElement('option');
+            option.value = xName;
+            option.textContent = xName;
+            falhaXTipo.appendChild(option);
+        });
+        falhaSelect.style.display = 'none'; // Esconde o falhaSelect
+    }
   });
 
 
@@ -1494,4 +1542,4 @@ case 'est17': return 'CBT';
     <span style="font-size: 14px; color: #444;">Gadelha Operador L5</span>
   </footer>
 </body>
-</html>
+                                              </html>
