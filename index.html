@@ -342,7 +342,7 @@
         <div class="estacao" id="est15">Hospital<br>São Paulo</div>
         <div class="estacao" id="est16">Santa<br>Cruz<br>🔁</div>
         <div class="estacao" id="est17">Chácara<br>Klabin<br>🔁 1</div>
-<div class="estacao" id="est17a">CBT</div>
+<div class="estacao" id="est17a">CBT<br>1</div>
       </div>
     </div>
     
@@ -366,7 +366,7 @@
         <div class="estacao" id="est15-v2">Hospital<br>São Paulo</div>
         <div class="estacao" id="est16-v2">Santa<br>Cruz<br>🔁</div>
         <div class="estacao" id="est17a-v2">Chácara<br>Klabin<br>🔁2</div>
-<div class="estacao" id="est17-v2">CBT</div>
+<div class="estacao" id="est17-v2">CBT<br>2</div>
       </div>
     </div>
     
@@ -487,13 +487,13 @@
   // Simulador Linha 5 Lilás JS
   // ========================== 
   
-  const falhasTremTextos = [
+const falhasTremTextos = [
     "Mal súbito de passageiro", "Problema de sinalização", "Retenção de portas", "Freio acionado pelo CBTC", 
     "Botão soco", "Sem laço de porta", "Intercom ar condicionado", "QRU01 Vias de fato", "QRU02 Comércio irregular", 
     "QRU03 Pedinte", "QRU04 Importunação sexual", "QRU05 Roubo", "QRU06 Furto", "QRU07 Arma branca", "QRU08 Tumulto", 
     "QRU09 Ocorrência com arma de fogo", "Meteoro caiu nos trilhos", "Codigo A", "Perda de comunicação", 
-    "Falha no ar condicionado", "Portas travadas", "Emergência a bordo", "Colisão com objeto", "Problema no pantógrafo", 
-    "Incêndio pequeno", "Vandalismo", "Alfa Bravo", "Falha no sistema de freios"
+    "Falha no ar condicionado", "Portas travadas", "Colisão com objeto", "Problema no pantógrafo", 
+     "Parada curta", "Parada longa", "Alfa Bravo", "Falha no sistema de freios"
   ];
   
   const falhasEstacaoTextos = [
@@ -566,15 +566,29 @@ const estacoes_v2 = [
   const FALHA_AUDIO_PATH = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
 
   // Mapeamento de falhas para soluções
-  const solucoesFalha = {
-    "Botão soco": "Acionar o CCO e informar o carro",
-    "Freio acionado pelo CBTC": "Fazer reciclo e informar o CCO",
-    // ... outras soluções
-  };
+    const solucoesFalha = {
+    // Soluções para falhas de trem
+    "Mal súbito de passageiro": "Acionar o CCO e informar o carro para auxílio.",
+    "Problema de sinalização": "Comunicar a sinalização e prosseguir com autorização do CCO.",
+    "Retenção de portas": "Fazer reciclo de portas e informar o CCO.",
+    "Freio acionado pelo CBTC": "Fazer reciclo de modalidade.",
+    "Botão soco": "Comunicar ao CCO, carro e porta e aguardar instruções.",
+    "Sem laço de porta": "Realizar rearme de laço,  verificar o carro com problema e informar ao CCO",
+    "Intercom ar condicionado": "Informar o CCO e aguardar possível autorização de abertura de escotilhas",
+    "Perda de comunicação": "Acionar o CCO,.aguardar instruções para  operar em manual até restabelecer a comunicação.",
+    "Falha no ar condicionado": "Comunicar ao CCO.",
+    "Portas travadas": "Comunicar ao CCO, e após autorização, fazer destravamento manual das portas.",    "Emergência a bordo": "Informar o CCO.",
+    "Colisão com objeto": " Informar o CCO, descrever brevementea o tipo de colisão. ",
+    "Problema no pantógrafo": "Informar falha de Panto na tela do TCMS.",    "Incêndio pequeno": "Acionar o CCO e utilizar extintor a bordo, se seguro.",
+    "Parada curta": "Completar o alinhamento em MCS, prestar serviços em AM e informar o CCO.",
+    "Parada longa": "Informar o CCO e emitir PA  Atencão! Devido a falha operacional este trem não prestará serviço nesta estação."
+ };
+
   
   const opcoesSolucao = [
-    "Acionar o CCO e informar o carro",
-    "Fazer reciclo e informar o CCO"
+    // Opções de solução genéricas para outras falhas
+    "Acionar o CCO.",
+   
   ];
 
   // Função para formatar nome da estação de recolhimento
@@ -1542,4 +1556,4 @@ case 'est17': return 'CBT';
     <span style="font-size: 14px; color: #444;">Gadelha Operador L5</span>
   </footer>
 </body>
-                                              </html>
+  </html>
