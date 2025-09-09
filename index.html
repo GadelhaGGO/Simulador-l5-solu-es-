@@ -552,6 +552,8 @@ const estacoes_v2 = [
   let tempoTotal = 0;
   let timer = null;
   let trensReter = false;
+let draggedTrem = null;
+let touchClone = null; // Nova variável para o clone de touch
   let falhaEstacao = null;
   let falhaEstacaoTipo = null;
   let falhaEstacaoNome = '';
@@ -587,7 +589,7 @@ const estacoes_v2 = [
   
   const opcoesSolucao = [
     // Opções de solução genéricas para outras falhas
-    "Acionar o CCO.",
+    "Acionar o CCO.", 
    
   ];
 
@@ -908,6 +910,18 @@ inserirMarcadorCentral('X 52', 'est16');
         // Adiciona um indicador (R) se o trem está a caminho do recolhimento
         const recolhimentoIndicator = trem.estacaoRecolhimento ? " (R)" : "";
         numLabel.textContent = ` T ${trem.id.toString().padStart(2, '0')}${recolhimentoIndicator}`;
+        numLabel.draggable = !!trensReter;
+        if (trensReter) {
+          numLabel.addEventListener('dragstart', dragStart);
+          numLabel.addEventListener('touchstart', touchStart, {passive:false});
+          numLabel.addEventListener('touchmove', touchMove, {passive:false});
+          numLabel.addEventListener('touchend', touchEnd, {passive:false});
+        } else {
+          numLabel.removeEventListener('dragstart', dragStart);
+          numLabel.removeEventListener('touchstart', touchStart);
+          numLabel.removeEventListener('touchmove', touchMove);
+          numLabel.removeEventListener('touchend', touchEnd);
+        }
 
 // Se o trem está em falha → deixa vermelho piscando
 if (trem.falha) {
@@ -1143,14 +1157,141 @@ el.appendChild(numLabel);
     return false;
   }
 
-  function toggleReterTrens() {
-    trensReter = !trensReter;
-    document.getElementById('btnReterTrens').textContent = trensReter ? 'Retomar Trens' : 'Reter Trens';
-    registrarHistorico(trensReter ? 'Trens retidos na linha' : 'Trens retomados');
-    atualizarLinha();
+  
+function toggleReterTrens() {
+  trensReter = !trensReter;
+  const btn = document.getElementById('btnReterTrens');
+  btn.textContent = trensReter ? "Retomar Trens" : "Reter Trens";
+  registrarHistorico(trensReter ? "Trens retidos na linha" : "Trens retomados");
+
+  // torna as estações zonas de drop
+  document.querySelectorAll('.estacao').forEach(st => {
+    st.addEventListener('dragover', dragOver);
+    st.addEventListener('drop', drop);
+  });
+
+  atualizarLinha();
+}
+
+
+  
+function dragStart(event) {
+  draggedTrem = event.target;
+  event.dataTransfer.effectAllowed = "move";
+}
+
+function dragOver(event) {
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "move";
+}
+
+function drop(event) {
+  event.preventDefault();
+  const station = event.currentTarget || event.target.closest('.estacao');
+  if (!station || !draggedTrem) return;
+
+  // Identificar trem pelo número
+  const m = draggedTrem.textContent.match(/T\s*(\d{2})/);
+  if (!m) return;
+  const id = Number(m[1]);
+  const trem = trens.find(t => t.id === id);
+  if (!trem) return;
+
+  // Atualizar posição lógica
+  const stationId = station.id;
+  const tremData = trensData.find(t => t.id === id);
+  if (!tremData) return;
+
+  if (estacoes_v2.includes(stationId)) {
+    tremData.loopStep = 0;
+    tremData.idx = estacoes_v2.indexOf(stationId);
+  } else if (estacoes_v1.includes(stationId)) {
+    tremData.loopStep = 1;
+    tremData.idx = estacoes_v1.indexOf(stationId);
   }
 
-  function aplicarFalha() {
+  atualizarLinha();
+}
+
+// Funções de toque para dispositivos móveis
+function touchStart(e) {
+  if (!trensReter) return;
+  draggedTrem = e.target;
+  e.preventDefault();
+  
+  // Clonar o elemento para visualização
+  touchClone = draggedTrem.cloneNode(true);
+  touchClone.style.position = "absolute";
+  touchClone.style.pointerEvents = "none";
+  touchClone.style.opacity = "0.8";
+  touchClone.style.transition = "none";
+  document.body.appendChild(touchClone);
+
+  touchMove(e); // Posicionar o clone inicialmente
+}
+
+function touchMove(e) {
+  if (touchClone) {
+    const touch = e.touches[0];
+    touchClone.style.left = `${touch.clientX}px`;
+    touchClone.style.top = `${touch.clientY}px`;
+  }
+}
+
+function touchEnd(e) {
+  if (touchClone) {
+    const touch = e.changedTouches[0];
+    const elem = document.elementFromPoint(touch.clientX, touch.clientY);
+    const station = elem?.closest(".estacao");
+    if (station && draggedTrem) {
+      const m = draggedTrem.textContent.match(/T\s*(\d{2})/);
+      if (m) {
+        const id = Number(m[1]);
+        const trem = trens.find(t => t.id === id);
+        const tremData = trensData.find(t => t.id === id);
+        if (trem && tremData) {
+          const stationId = station.id;
+          if (estacoes_v2.includes(stationId)) {
+            tremData.loopStep = 0;
+            tremData.idx = estacoes_v2.indexOf(stationId);
+          } else if (estacoes_v1.includes(stationId)) {
+            tremData.loopStep = 1;
+            tremData.idx = estacoes_v1.indexOf(stationId);
+          }
+        }
+      }
+      atualizarLinha();
+    }
+    touchClone.remove();
+    touchClone = null;
+  }
+  draggedTrem = null;
+  e.preventDefault();
+}
+
+
+function atualizarPosicoes() {
+  document.querySelectorAll('.estacao').forEach(stEl => {
+    const label = stEl.querySelector('.trem-num-label');
+    if (!label) return;
+    const m = label.textContent.match(/T\s*(\d{2})/);
+    if (!m) return;
+    const id = Number(m[1]);
+    const td = trens.find(x => x.id === id);
+    if (!td) return;
+    const stationId = stEl.id;
+    if (estacoes_v2.includes(stationId)) {
+      td.loopStep = 0;
+      td.idx = estacoes_v2.indexOf(stationId);
+    } else if (estacoes_v1.includes(stationId)) {
+      td.loopStep = 1;
+      td.idx = estacoes_v1.indexOf(stationId);
+    }
+  });
+}
+
+
+function aplicarFalha() {
     const falhaTipo = document.getElementById('falhaTipoSelect').value;
     
     if (falhaTipo === "estacao") {
