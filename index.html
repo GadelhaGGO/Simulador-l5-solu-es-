@@ -452,8 +452,8 @@
                 <option value="">Selecione a estação</option>
                 <option value="capao-v1">Capão Redondo - Via 1</option>
                 <option value="capao-v2">Capão Redondo - Via 2</option>
-                <option value="santo-v1">Santo Amaro - Via 1</option>
-                <option value="santo-v2">Santo Amaro - Via 2</option>
+                <option value="giovanni-v1">TF 14</option>
+                <option value="santo-v2">TF 13</option>
                 <option value="klabin-v1">Chácara Klabin - Via 1</option>
                 <option value="klabin-v2">Chácara Klabin - Via 2</option>
             </select>
@@ -493,14 +493,14 @@ const falhasTremTextos = [
     "QRU03 Pedinte", "QRU04 Importunação sexual", "QRU05 Roubo", "QRU06 Furto", "QRU07 Arma branca", "QRU08 Tumulto", 
     "QRU09 Ocorrência com arma de fogo", "Meteoro caiu nos trilhos", "Codigo A", "Perda de comunicação", 
     "Falha no ar condicionado", "Portas travadas", "Colisão com objeto", "Problema no pantógrafo", 
-     "Parada curta", "Parada longa", "Alfa Bravo", "Falha no sistema de freios"
+     "Parada curta", "Parada longa", "Alfa Bravo", "Falha no sistema de freios", 
   ];
   
   const falhasEstacaoTextos = [
     "Mal súbito de passageiro", "Queda de energia", "Passageiro perdido no sistema", "Codigo A", 
     "Incêndio na estação", "Portões de plataforma com problema", "Inundação", "Problema na escada rolante", 
     "Acesso bloqueado", "Fumaça na plataforma", "Alarme falso de incêndio", "Vazamento de água", 
-    "Problema na bilheteria", "Pichação", "Esgoto entupido", "falha de PDM", 
+    "Problema na bilheteria", "Pichação", "Esporte entupido", "falha de PDM", 
     "Alarme de emergência ativado", "Sem luz na estação", "Ataque de abelhas", "Problema no elevador"
   ];
   
@@ -524,7 +524,7 @@ const falhasTremTextos = [
       nome: `Trem ${String(idx + 1).padStart(2, '0')}`,
       delay: 0,
       status: 'Aguardando partida...',
-      ativo: true,
+      ativo: false,  // Alterado para false inicialmente
       recolhido: false,
       falha: null,
       estacaoRecolhimento: null,  // Nova propriedade para recolhimento
@@ -643,7 +643,7 @@ function inserirMarcadorCentral(texto, estacaoAnteriorId) {
     // Adiciona o marcador ao corpo do documento (ou ao contêiner principal)
     document.body.appendChild(marcador);
 
-    // Obtém as coordenadas da estação anterior e da próxima estação
+    // Obtém las coordenadas da estação anterior e da próxima estação
     const estacaoAtual = estacaoAnterior.getBoundingClientRect();
     const proximaEstacao = estacaoAnterior.nextElementSibling ? estacaoAnterior.nextElementSibling.getBoundingClientRect() : null;
 
@@ -997,7 +997,7 @@ el.appendChild(numLabel);
 
   for (let i = potInicial; i < trens.length; i++) {
     trens[i].ativo = false;
-    trens[i].recolhido = true;
+    trens[i].recolhido = false;
     trens[i].falha = null;
   }
 
@@ -1014,19 +1014,19 @@ el.appendChild(numLabel);
 }
 
   function aumentarPOT() {
-  if (recolhidos.length === 0) {
+  // Obter todos os trens inativos (não ativos e não recolhidos)
+  const trensDisponiveis = trens.filter(t => !t.ativo && !t.recolhido);
+  
+  if (trensDisponiveis.length === 0) {
     alert("Nenhum trem disponível para adicionar.");
     return;
   }
 
-  // Escolhe um trem recolhido
-  const tremId = recolhidos.shift();
-  const trem = trens.find(t => t.id === tremId);
-  if (!trem) return;
-
+  // Escolhe um trem disponível
+  const trem = trensDisponiveis[0];
+  
   // Escolhe uma estação aleatória livre
   const todasEstacoes = estacoes_v1.concat(estacoes_v2);
-  let estacaoEscolhida;
   let ocupadas = trensData.map(td => LOOP[td.loopStep].estacoes[td.idx]);
 
   let livres = todasEstacoes.filter(e => !ocupadas.includes(e));
@@ -1035,7 +1035,7 @@ el.appendChild(numLabel);
     return;
   }
 
-  estacaoEscolhida = livres[Math.floor(Math.random() * livres.length)];
+  const estacaoEscolhida = livres[Math.floor(Math.random() * livres.length)];
 
   // Define a via e índice
   let newLoopStep, newIdx;
@@ -1092,7 +1092,7 @@ el.appendChild(numLabel);
     trensData = [];
     for (const t of trens) {
       t.status = 'Aguardando partida...';
-      t.ativo = true;
+      t.ativo = false;
       t.recolhido = false;
       t.falha = null;
       t.estacaoRecolhimento = null;
@@ -1283,7 +1283,7 @@ function atualizarPosicoes() {
     if (estacoes_v2.includes(stationId)) {
       td.loopStep = 0;
       td.idx = estacoes_v2.indexOf(stationId);
-    } else if (estacoes_v1.includes(stationId)) {
+  } else if (estacoes_v1.includes(stationId)) {
       td.loopStep = 1;
       td.idx = estacoes_v1.indexOf(stationId);
     }
@@ -1412,7 +1412,9 @@ const falhasXmap = {
   }
 
   function abrirInserirTrem() {
-    if (!recolhidos.length) return alert('Nenhum trem recolhido disponível para inserir');
+    // Verificar se há trens disponíveis (inativos)
+    const trensDisponiveis = trens.filter(t => !t.ativo && !t.recolhido);
+    if (trensDisponiveis.length === 0) return alert('Nenhum trem disponível para inserir');
     document.getElementById('modalInserirTrem').style.display = 'block';
     atualizarTremInserirSelect();
   }
@@ -1433,11 +1435,10 @@ const falhasXmap = {
   function atualizarTremInserirSelect() {
     const select = document.getElementById('tremInserirSelect');
     select.innerHTML = `<option value="">Selecione um trem</option>`;
-    recolhidos.sort((a, b) => a - b).forEach(n => {
-      const trem = trens.find(t => t.id === n);
-      if (trem) {
-        select.innerHTML += `<option value="${n}">${trem.nome}</option>`;
-      }
+    
+    // Mostrar todos os trens inativos (não ativos e não recolhidos)
+    trens.filter(t => !t.ativo && !t.recolhido).forEach(trem => {
+      select.innerHTML += `<option value="${trem.id}">${trem.nome}</option>`;
     });
   }
 
@@ -1449,7 +1450,7 @@ const falhasXmap = {
     if (!estacaoEscolhida) return alert('Selecione a estação de inserção');
 
     const trem = trens.find(t => t.id === tremNum);
-    if (!trem || !trem.recolhido) return;
+    if (!trem || trem.ativo) return;
 
     trem.ativo = true;
     trem.recolhido = false;
@@ -1462,7 +1463,7 @@ const falhasXmap = {
     switch (estacaoEscolhida) {
       case "capao-v1": newLoopStep = 1; newIdx = estacoes_v1.indexOf("est1"); break;
       case "capao-v2": newLoopStep = 0; newIdx = estacoes_v2.indexOf("est1-v2"); break;
-      case "santo-v1": newLoopStep = 1; newIdx = estacoes_v1.indexOf("est5"); break;
+      case "giovanni-v1": newLoopStep = 1; newIdx = estacoes_v1.indexOf("est4"); break;
       case "santo-v2": newLoopStep = 0; newIdx = estacoes_v2.indexOf("est5-v2"); break;
       case "klabin-v1": newLoopStep = 1; newIdx = estacoes_v1.indexOf("est17"); break;
       case "klabin-v2": newLoopStep = 0; newIdx = estacoes_v2.indexOf("est17-v2"); break;
@@ -1480,7 +1481,6 @@ const falhasXmap = {
       aguardandoProximoTrem: false
     });
 
-    recolhidos = recolhidos.filter(n => n !== tremNum);
     fecharInserirTrem();
     registrarHistorico(`${trem.nome} inserido em ${estacaoEscolhida}`);
     atualizarLinha();
@@ -1697,4 +1697,4 @@ case 'est17': return 'CBT';
     <span style="font-size: 14px; color: #444;">Gadelha Operador L5</span>
   </footer>
 </body>
-  </html>
+</html>
